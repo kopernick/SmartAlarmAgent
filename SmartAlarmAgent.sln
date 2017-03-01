@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartAlarmAgent", "SmartAlarmAgent\SmartAlarmAgent.csproj", "{8F7DFF96-BFF8-4E9F-9D86-D55E8A877EE1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartAlarmAgent.Data", "SmartAlarmAgent.Data\SmartAlarmAgent.Data.csproj", "{82334C48-50F5-490D-BACC-DD45CFBF5574}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartAlarmData", "SmartAlarmData\SmartAlarmData.csproj", "{734CA420-94E6-4A0B-9AF0-5B6DE35301B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{8F7DFF96-BFF8-4E9F-9D86-D55E8A877EE1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8F7DFF96-BFF8-4E9F-9D86-D55E8A877EE1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8F7DFF96-BFF8-4E9F-9D86-D55E8A877EE1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{82334C48-50F5-490D-BACC-DD45CFBF5574}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{82334C48-50F5-490D-BACC-DD45CFBF5574}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{82334C48-50F5-490D-BACC-DD45CFBF5574}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{82334C48-50F5-490D-BACC-DD45CFBF5574}.Release|Any CPU.Build.0 = Release|Any CPU
+		{734CA420-94E6-4A0B-9AF0-5B6DE35301B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{734CA420-94E6-4A0B-9AF0-5B6DE35301B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{734CA420-94E6-4A0B-9AF0-5B6DE35301B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{734CA420-94E6-4A0B-9AF0-5B6DE35301B2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

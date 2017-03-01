@@ -1,0 +1,388 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="RestorationAlarmData.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2008" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="DeviceID" />
+          </Key>
+          <Property Name="DeviceID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DeviceType" Type="varchar" MaxLength="100" />
+        </EntityType>
+        <EntityType Name="DigitalPointInfo">
+          <Key>
+            <PropertyRef Name="PkDigitalID" />
+          </Key>
+          <Property Name="FkStationID" Type="int" />
+          <Property Name="PointNumber" Type="int" />
+          <Property Name="StationName" Type="char" MaxLength="15" />
+          <Property Name="PkDigitalID" Type="int" Nullable="false" />
+          <Property Name="FkRtuID" Type="int" />
+          <Property Name="FkRtuDigitalInID" Type="int" />
+          <Property Name="PointName" Type="char" MaxLength="40" />
+          <Property Name="ShortName" Type="char" MaxLength="14" />
+          <Property Name="SourceType" Type="tinyint" />
+          <Property Name="ShowType" Type="tinyint" />
+          <Property Name="RawValue" Type="smallint" />
+          <Property Name="ActualValue" Type="tinyint" />
+          <Property Name="OffsetValue" Type="float" />
+          <Property Name="NormalState" Type="tinyint" />
+          <Property Name="ChangeDetect" Type="tinyint" />
+          <Property Name="ReplaceValue" Type="tinyint" />
+          <Property Name="AudioInhibit" Type="tinyint" />
+          <Property Name="AlarmInhibit" Type="tinyint" />
+          <Property Name="RTNAlarmInhibit" Type="tinyint" />
+          <Property Name="AlarmPriority" Type="tinyint" />
+          <Property Name="LogInhibit" Type="tinyint" />
+          <Property Name="RTNLogInhibit" Type="tinyint" />
+          <Property Name="ControlType" Type="tinyint" />
+          <Property Name="ControlInhibit" Type="tinyint" />
+          <Property Name="ControlInhibitType" Type="tinyint" />
+          <Property Name="OutOfService" Type="tinyint" />
+          <Property Name="OperationTag" Type="tinyint" />
+          <Property Name="FkRtuDigitalOutID" Type="int" />
+          <Property Name="FkCalcID" Type="int" />
+          <Property Name="FkEcaSwID" Type="int" />
+          <Property Name="CaptionCode" Type="int" />
+          <Property Name="FkAlarmGroupID" Type="int" />
+          <Property Name="FkEquipmentID" Type="int" />
+          <Property Name="FkBayID" Type="int" />
+          <Property Name="Flashing" Type="tinyint" />
+          <Property Name="TelemeterFail" Type="tinyint" />
+          <Property Name="UnderControl" Type="tinyint" />
+          <Property Name="DataLinkFlag" Type="tinyint" />
+          <Property Name="DateTime" Type="datetime" />
+          <Property Name="DeviceID" Type="int" />
+          <Property Name="DeviceType" Type="varchar" MaxLength="100" />
+          <Property Name="MACName" Type="varchar" MaxLength="100" />
+          <Property Name="Priority" Type="char" MaxLength="32" />
+        </EntityType>
+        <EntityType Name="Priority">
+          <Key>
+            <PropertyRef Name="PriorityID" />
+          </Key>
+          <Property Name="PriorityID" Type="int" Nullable="false" />
+          <Property Name="PriorityName" Type="char" MaxLength="32" />
+        </EntityType>
+        <EntityType Name="RestorationAlarmList">
+          <Key>
+            <PropertyRef Name="PkAlarmListID" />
+          </Key>
+          <Property Name="PkAlarmListID" Type="int" Nullable="false" />
+          <Property Name="DateTime" Type="datetime" />
+          <Property Name="PointType" Type="tinyint" />
+          <Property Name="FkIndexID" Type="int" />
+          <Property Name="StationName" Type="char" MaxLength="15" />
+          <Property Name="PointName" Type="char" MaxLength="40" />
+          <Property Name="AlarmType" Type="int" />
+          <Property Name="Flashing" Type="tinyint" />
+          <Property Name="ActualValue" Type="float" />
+          <Property Name="Message" Type="char" MaxLength="40" />
+          <Property Name="SourceName" Type="char" MaxLength="20" />
+          <Property Name="SourceID" Type="int" />
+          <Property Name="SourceType" Type="tinyint" />
+          <Property Name="AlarmFlag" Type="tinyint" />
+          <Property Name="DeviceType" Type="varchar" MaxLength="100" />
+          <Property Name="MACName" Type="varchar" MaxLength="100" />
+          <Property Name="Priority" Type="char" MaxLength="32" />
+        </EntityType>
+        <EntityType Name="Station">
+          <Key>
+            <PropertyRef Name="PkStationID" />
+          </Key>
+          <Property Name="PkStationID" Type="int" Nullable="false" />
+          <Property Name="StationName" Type="char" MaxLength="15" Nullable="false" />
+          <Property Name="StationNumber" Type="int" Nullable="false" />
+          <Property Name="Detail" Type="char" MaxLength="80" />
+          <Property Name="DCSName" Type="char" MaxLength="15" />
+          <Property Name="DCSNumber" Type="tinyint" />
+          <Property Name="RegionName" Type="char" MaxLength="15" />
+          <Property Name="RegionNumber" Type="tinyint" />
+        </EntityType>
+        <Association Name="FK_DigitalPointInfo_Device">
+          <End Role="Device" Type="Self.Device" Multiplicity="0..1" />
+          <End Role="DigitalPointInfo" Type="Self.DigitalPointInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Device">
+              <PropertyRef Name="DeviceID" />
+            </Principal>
+            <Dependent Role="DigitalPointInfo">
+              <PropertyRef Name="DeviceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Function Name="BackUpDigitalPointInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <EntityContainer Name="RestorationAlarmDataStoreContainer">
+          <EntitySet Name="Device" EntityType="Self.Device" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DigitalPointInfo" EntityType="Self.DigitalPointInfo" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Priority" EntityType="Self.Priority" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="RestorationAlarmList" EntityType="Self.RestorationAlarmList" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Station" EntityType="Self.Station" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_DigitalPointInfo_Device" Association="Self.FK_DigitalPointInfo_Device">
+            <End Role="Device" EntitySet="Device" />
+            <End Role="DigitalPointInfo" EntitySet="DigitalPointInfo" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="RestorationAlarmData" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Device">
+          <Key>
+            <PropertyRef Name="DeviceID" />
+          </Key>
+          <Property Name="DeviceID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <NavigationProperty Name="DigitalPointInfo" Relationship="Self.FK_DigitalPointInfo_Device" FromRole="Device" ToRole="DigitalPointInfo" />
+        </EntityType>
+        <EntityType Name="DigitalPointInfo">
+          <Key>
+            <PropertyRef Name="PkDigitalID" />
+          </Key>
+          <Property Name="FkStationID" Type="Int32" />
+          <Property Name="PointNumber" Type="Int32" />
+          <Property Name="StationName" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="PkDigitalID" Type="Int32" Nullable="false" />
+          <Property Name="FkRtuID" Type="Int32" />
+          <Property Name="FkRtuDigitalInID" Type="Int32" />
+          <Property Name="PointName" Type="String" MaxLength="40" FixedLength="true" Unicode="false" />
+          <Property Name="ShortName" Type="String" MaxLength="14" FixedLength="true" Unicode="false" />
+          <Property Name="SourceType" Type="Byte" />
+          <Property Name="ShowType" Type="Byte" />
+          <Property Name="RawValue" Type="Int16" />
+          <Property Name="ActualValue" Type="Byte" />
+          <Property Name="OffsetValue" Type="Double" />
+          <Property Name="NormalState" Type="Byte" />
+          <Property Name="ChangeDetect" Type="Byte" />
+          <Property Name="ReplaceValue" Type="Byte" />
+          <Property Name="AudioInhibit" Type="Byte" />
+          <Property Name="AlarmInhibit" Type="Byte" />
+          <Property Name="RTNAlarmInhibit" Type="Byte" />
+          <Property Name="AlarmPriority" Type="Byte" />
+          <Property Name="LogInhibit" Type="Byte" />
+          <Property Name="RTNLogInhibit" Type="Byte" />
+          <Property Name="ControlType" Type="Byte" />
+          <Property Name="ControlInhibit" Type="Byte" />
+          <Property Name="ControlInhibitType" Type="Byte" />
+          <Property Name="OutOfService" Type="Byte" />
+          <Property Name="OperationTag" Type="Byte" />
+          <Property Name="FkRtuDigitalOutID" Type="Int32" />
+          <Property Name="FkCalcID" Type="Int32" />
+          <Property Name="FkEcaSwID" Type="Int32" />
+          <Property Name="CaptionCode" Type="Int32" />
+          <Property Name="FkAlarmGroupID" Type="Int32" />
+          <Property Name="FkEquipmentID" Type="Int32" />
+          <Property Name="FkBayID" Type="Int32" />
+          <Property Name="Flashing" Type="Byte" />
+          <Property Name="TelemeterFail" Type="Byte" />
+          <Property Name="UnderControl" Type="Byte" />
+          <Property Name="DataLinkFlag" Type="Byte" />
+          <Property Name="DateTime" Type="DateTime" Precision="3" />
+          <Property Name="DeviceID" Type="Int32" />
+          <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MACName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
+          <NavigationProperty Name="Device" Relationship="Self.FK_DigitalPointInfo_Device" FromRole="DigitalPointInfo" ToRole="Device" />
+        </EntityType>
+        <EntityType Name="Priority">
+          <Key>
+            <PropertyRef Name="PriorityID" />
+          </Key>
+          <Property Name="PriorityID" Type="Int32" Nullable="false" />
+          <Property Name="PriorityName" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="RestorationAlarmList">
+          <Key>
+            <PropertyRef Name="PkAlarmListID" />
+          </Key>
+          <Property Name="PkAlarmListID" Type="Int32" Nullable="false" />
+          <Property Name="DateTime" Type="DateTime" Precision="3" />
+          <Property Name="PointType" Type="Byte" />
+          <Property Name="FkIndexID" Type="Int32" />
+          <Property Name="StationName" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="PointName" Type="String" MaxLength="40" FixedLength="true" Unicode="false" />
+          <Property Name="AlarmType" Type="Int32" />
+          <Property Name="Flashing" Type="Byte" />
+          <Property Name="ActualValue" Type="Double" />
+          <Property Name="Message" Type="String" MaxLength="40" FixedLength="true" Unicode="false" />
+          <Property Name="SourceName" Type="String" MaxLength="20" FixedLength="true" Unicode="false" />
+          <Property Name="SourceID" Type="Int32" />
+          <Property Name="SourceType" Type="Byte" />
+          <Property Name="AlarmFlag" Type="Byte" />
+          <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MACName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
+        </EntityType>
+        <EntityType Name="Station">
+          <Key>
+            <PropertyRef Name="PkStationID" />
+          </Key>
+          <Property Name="PkStationID" Type="Int32" Nullable="false" />
+          <Property Name="StationName" Type="String" MaxLength="15" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="StationNumber" Type="Int32" Nullable="false" />
+          <Property Name="Detail" Type="String" MaxLength="80" FixedLength="true" Unicode="false" />
+          <Property Name="DCSName" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="DCSNumber" Type="Byte" />
+          <Property Name="RegionName" Type="String" MaxLength="15" FixedLength="true" Unicode="false" />
+          <Property Name="RegionNumber" Type="Byte" />
+        </EntityType>
+        <Association Name="FK_DigitalPointInfo_Device">
+          <End Role="Device" Type="Self.Device" Multiplicity="0..1" />
+          <End Role="DigitalPointInfo" Type="Self.DigitalPointInfo" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Device">
+              <PropertyRef Name="DeviceID" />
+            </Principal>
+            <Dependent Role="DigitalPointInfo">
+              <PropertyRef Name="DeviceID" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="RestorationAlarmDbContext" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Device" EntityType="Self.Device" />
+          <EntitySet Name="DigitalPointInfo" EntityType="Self.DigitalPointInfo" />
+          <EntitySet Name="Priority" EntityType="Self.Priority" />
+          <EntitySet Name="RestorationAlarmList" EntityType="Self.RestorationAlarmList" />
+          <EntitySet Name="Station" EntityType="Self.Station" />
+          <AssociationSet Name="FK_DigitalPointInfo_Device" Association="Self.FK_DigitalPointInfo_Device">
+            <End Role="Device" EntitySet="Device" />
+            <End Role="DigitalPointInfo" EntitySet="DigitalPointInfo" />
+          </AssociationSet>
+          <FunctionImport Name="BackUpDigitalPointInfo" />
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="RestorationAlarmDataStoreContainer" CdmEntityContainer="RestorationAlarmDbContext">
+          <EntitySetMapping Name="Device">
+            <EntityTypeMapping TypeName="RestorationAlarmData.Device">
+              <MappingFragment StoreEntitySet="Device">
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
+                <ScalarProperty Name="DeviceType" ColumnName="DeviceType" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DigitalPointInfo">
+            <EntityTypeMapping TypeName="RestorationAlarmData.DigitalPointInfo">
+              <MappingFragment StoreEntitySet="DigitalPointInfo">
+                <ScalarProperty Name="FkStationID" ColumnName="FkStationID" />
+                <ScalarProperty Name="PointNumber" ColumnName="PointNumber" />
+                <ScalarProperty Name="StationName" ColumnName="StationName" />
+                <ScalarProperty Name="PkDigitalID" ColumnName="PkDigitalID" />
+                <ScalarProperty Name="FkRtuID" ColumnName="FkRtuID" />
+                <ScalarProperty Name="FkRtuDigitalInID" ColumnName="FkRtuDigitalInID" />
+                <ScalarProperty Name="PointName" ColumnName="PointName" />
+                <ScalarProperty Name="ShortName" ColumnName="ShortName" />
+                <ScalarProperty Name="SourceType" ColumnName="SourceType" />
+                <ScalarProperty Name="ShowType" ColumnName="ShowType" />
+                <ScalarProperty Name="RawValue" ColumnName="RawValue" />
+                <ScalarProperty Name="ActualValue" ColumnName="ActualValue" />
+                <ScalarProperty Name="OffsetValue" ColumnName="OffsetValue" />
+                <ScalarProperty Name="NormalState" ColumnName="NormalState" />
+                <ScalarProperty Name="ChangeDetect" ColumnName="ChangeDetect" />
+                <ScalarProperty Name="ReplaceValue" ColumnName="ReplaceValue" />
+                <ScalarProperty Name="AudioInhibit" ColumnName="AudioInhibit" />
+                <ScalarProperty Name="AlarmInhibit" ColumnName="AlarmInhibit" />
+                <ScalarProperty Name="RTNAlarmInhibit" ColumnName="RTNAlarmInhibit" />
+                <ScalarProperty Name="AlarmPriority" ColumnName="AlarmPriority" />
+                <ScalarProperty Name="LogInhibit" ColumnName="LogInhibit" />
+                <ScalarProperty Name="RTNLogInhibit" ColumnName="RTNLogInhibit" />
+                <ScalarProperty Name="ControlType" ColumnName="ControlType" />
+                <ScalarProperty Name="ControlInhibit" ColumnName="ControlInhibit" />
+                <ScalarProperty Name="ControlInhibitType" ColumnName="ControlInhibitType" />
+                <ScalarProperty Name="OutOfService" ColumnName="OutOfService" />
+                <ScalarProperty Name="OperationTag" ColumnName="OperationTag" />
+                <ScalarProperty Name="FkRtuDigitalOutID" ColumnName="FkRtuDigitalOutID" />
+                <ScalarProperty Name="FkCalcID" ColumnName="FkCalcID" />
+                <ScalarProperty Name="FkEcaSwID" ColumnName="FkEcaSwID" />
+                <ScalarProperty Name="CaptionCode" ColumnName="CaptionCode" />
+                <ScalarProperty Name="FkAlarmGroupID" ColumnName="FkAlarmGroupID" />
+                <ScalarProperty Name="FkEquipmentID" ColumnName="FkEquipmentID" />
+                <ScalarProperty Name="FkBayID" ColumnName="FkBayID" />
+                <ScalarProperty Name="Flashing" ColumnName="Flashing" />
+                <ScalarProperty Name="TelemeterFail" ColumnName="TelemeterFail" />
+                <ScalarProperty Name="UnderControl" ColumnName="UnderControl" />
+                <ScalarProperty Name="DataLinkFlag" ColumnName="DataLinkFlag" />
+                <ScalarProperty Name="DateTime" ColumnName="DateTime" />
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
+                <ScalarProperty Name="DeviceType" ColumnName="DeviceType" />
+                <ScalarProperty Name="MACName" ColumnName="MACName" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Priority">
+            <EntityTypeMapping TypeName="RestorationAlarmData.Priority">
+              <MappingFragment StoreEntitySet="Priority">
+                <ScalarProperty Name="PriorityName" ColumnName="PriorityName" />
+                <ScalarProperty Name="PriorityID" ColumnName="PriorityID" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="RestorationAlarmList">
+            <EntityTypeMapping TypeName="RestorationAlarmData.RestorationAlarmList">
+              <MappingFragment StoreEntitySet="RestorationAlarmList">
+                <ScalarProperty Name="PkAlarmListID" ColumnName="PkAlarmListID" />
+                <ScalarProperty Name="DateTime" ColumnName="DateTime" />
+                <ScalarProperty Name="PointType" ColumnName="PointType" />
+                <ScalarProperty Name="FkIndexID" ColumnName="FkIndexID" />
+                <ScalarProperty Name="StationName" ColumnName="StationName" />
+                <ScalarProperty Name="PointName" ColumnName="PointName" />
+                <ScalarProperty Name="AlarmType" ColumnName="AlarmType" />
+                <ScalarProperty Name="Flashing" ColumnName="Flashing" />
+                <ScalarProperty Name="ActualValue" ColumnName="ActualValue" />
+                <ScalarProperty Name="Message" ColumnName="Message" />
+                <ScalarProperty Name="SourceName" ColumnName="SourceName" />
+                <ScalarProperty Name="SourceID" ColumnName="SourceID" />
+                <ScalarProperty Name="SourceType" ColumnName="SourceType" />
+                <ScalarProperty Name="AlarmFlag" ColumnName="AlarmFlag" />
+                <ScalarProperty Name="DeviceType" ColumnName="DeviceType" />
+                <ScalarProperty Name="MACName" ColumnName="MACName" />
+                <ScalarProperty Name="Priority" ColumnName="Priority" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Station">
+            <EntityTypeMapping TypeName="RestorationAlarmData.Station">
+              <MappingFragment StoreEntitySet="Station">
+                <ScalarProperty Name="PkStationID" ColumnName="PkStationID" />
+                <ScalarProperty Name="StationName" ColumnName="StationName" />
+                <ScalarProperty Name="StationNumber" ColumnName="StationNumber" />
+                <ScalarProperty Name="Detail" ColumnName="Detail" />
+                <ScalarProperty Name="DCSName" ColumnName="DCSName" />
+                <ScalarProperty Name="DCSNumber" ColumnName="DCSNumber" />
+                <ScalarProperty Name="RegionName" ColumnName="RegionName" />
+                <ScalarProperty Name="RegionNumber" ColumnName="RegionNumber" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <FunctionImportMapping FunctionImportName="BackUpDigitalPointInfo" FunctionName="RestorationAlarmData.Store.BackUpDigitalPointInfo" />
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="None" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

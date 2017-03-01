@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SmartAlarmAgent.Data")]
+[assembly: AssemblyTitle("SmartAlarmData")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("SmartAlarmAgent.Data")]
+[assembly: AssemblyProduct("SmartAlarmData")]
 [assembly: AssemblyCopyright("Copyright ©  2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("82334c48-50f5-490d-bacc-dd45cfbf5574")]
+[assembly: Guid("734ca420-94e6-4a0b-9af0-5b6de35301b2")]
 
 // Version information for an assembly consists of the following four values:
 //
