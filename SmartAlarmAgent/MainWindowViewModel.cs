@@ -10,7 +10,7 @@ using SmartAlarmAgent.Service;
 
 namespace SmartAlarmAgent
 {
-    public class MainWindowViewModel
+     class MainWindowViewModel
     {
         #region Prooerties
 
@@ -52,7 +52,7 @@ namespace SmartAlarmAgent
         #region Methode
         private async void Test_LoadedAsync()
         {
-            var x = await _mAlarmList.GetAlarmListAsync();
+            var x = await _mAlarmList.GetInitAlarmListAsync();
             //Test cw
             var Station = _mAlarmList.ListAlarm
                     .Where(c => c.StationName.Contains("BK"))

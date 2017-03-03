@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using SmartAlarmAgent.Model;
 using SmartAlarmAgent.Service;
 using System.IO;
+using System.Threading;
 
 namespace SmartAlarmAgent.Repository
 {
-    public class AlarmListCSVRepo
+     class AlarmListCSVRepo
     {
         
         #region Properties
@@ -72,24 +73,32 @@ namespace SmartAlarmAgent.Repository
 
         #endregion Constructor
 
-
         #region Methode
-        public async Task<bool> GetAlarmListAsync()
+        public async Task<bool> GetInitAlarmListAsync()
         {
-            return await Task.Run(() => exeGetAlarmListCSV());
+            return await Task.Run(() => exeGetInitAlarmListCSV());
         }
 
-        private bool exeGetAlarmListCSV()
+        private bool exeGetInitAlarmListCSV()
         {
             RestEventArgs args = new RestEventArgs();
 
             this._listAlarm.Clear();
+
             try
             {
-                string csvFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
+                string csvFile = @"\\10.20.86.210\ExportDB\AlarmList2.csv";
 
 
 #if true
+                int nRetry_read = 0;
+
+                do //Retry tor Read CSV File 
+                {
+                    Thread.Sleep(TimeSpan.FromSeconds(1));
+                    if (nRetry_read++ >= 10) break;
+                } while (IsFileLocked(csvFile));
+
                 this._listAlarm = File.ReadLines(csvFile)
                             .Skip(1)
                             .Select(line => AlarmList.GetLineAlarmListCsv(line))
@@ -149,7 +158,28 @@ namespace SmartAlarmAgent.Repository
             }
         }
 
+        public async Task<bool> GetNewAlarmListAsync()
+        {
+            return await Task.Run(() => exeGetNewtAlarmListCSV());
+        }
+        private bool exeGetNewtAlarmListCSV()
+        {
+            //int iStartIndex = 0;
+            //this.m_nNewRestPoint = 0;
 
+            //if (this.m_nLastAlarmRecIndex >= 0) //If Start program m_nLastAlarmRecIndex is set to -1 see also Alarm4Restoration()
+            //{
+            //    for (int iIndex = 0; iIndex < this.m_listAlarm.Count; iIndex++)
+            //    {
+            //        DigitalAlarm al = this.m_listAlarm[iIndex];
+            //        if (al.RecIndex != this.m_nLastAlarmRecIndex) continue;
+            //        iStartIndex = (iIndex) % this.m_listAlarm.Count;  // New Incoming Alarm Star here.
+            //        break;
+            //    }
+            //}
+
+            return true;
+        }
         private bool IsFileLocked(string path)
         {
             FileInfo file = new FileInfo(path);
@@ -159,6 +189,11 @@ namespace SmartAlarmAgent.Repository
             {
                 stream = file.Open(FileMode.Open, FileAccess.Read);
 
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                Console.WriteLine("Error File not found");
+                return this._bFlgFileIsLocked = true; //File is Locked
             }
             catch (IOException)
             {

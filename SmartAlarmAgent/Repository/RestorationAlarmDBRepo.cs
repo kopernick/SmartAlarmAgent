@@ -51,8 +51,12 @@ namespace SmartAlarmAgent.Repository
         public async Task<List<DigitalPointInfo>> GetAllDigitalPointInfoAsync()
         {
             RestEventArgs args = new RestEventArgs();
+
             try
             {
+                args.message = "Read DB Success";
+                args.TimeStamp = DateTime.Now;
+
                 return await _RestAlarmContext.DigitalPointInfo
                     .Where(c => !(string.IsNullOrEmpty(c.MACName)))
                     .ToListAsync<DigitalPointInfo>();
@@ -61,8 +65,14 @@ namespace SmartAlarmAgent.Repository
             {
                 args.message = "Read DB Fail";
                 args.TimeStamp = DateTime.Now;
-                onRestAlarmDBChanged(args); //Raise the Event
                 return null;
+                
+            }
+            finally
+            {
+                //Send Event after Get All DigitalInfo
+                onRestAlarmDBChanged(args); //Raise the Event
+
             }
             
         }
