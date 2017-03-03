@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using SmartAlarmData;
+using System.Data.Entity;
+using SmartAlarmAgent.Service;
 
 namespace SmartAlarmAgent.Repository
 {
-    class RestorationAlarmDBRepo
+    public class RestorationAlarmDBRepo
     {
         #region Prooerties
 
@@ -24,7 +26,18 @@ namespace SmartAlarmAgent.Repository
             }
         }
 
+        public DateTime dLastLoadDB { get; set; }
+
         #endregion Properties
+
+        #region Event & Delegate
+        public event EventHandler<RestEventArgs> RestAlarmDBChanged;
+        private void onRestAlarmDBChanged(RestEventArgs arg)
+        {
+            if (RestAlarmDBChanged != null)
+                RestAlarmDBChanged(null, arg);
+        }
+        #endregion Event & Delegate
 
         #region Constructor
         public RestorationAlarmDBRepo()
@@ -35,28 +48,25 @@ namespace SmartAlarmAgent.Repository
         #endregion Constructor
 
         #region Methode
-        public async Task<List<DigitalPointInfo>> GetSationNameAsync()
+        public async Task<List<DigitalPointInfo>> GetAllDigitalPointInfoAsync()
         {
-            return await Task.Run(() => exeGetSationNameAsync());
-        }
-
-        public List<DigitalPointInfo> exeGetSationNameAsync()
-        {
-            IQueryable<DigitalPointInfo> Stations;
-            using (this._RestAlarmContext)
+            RestEventArgs args = new RestEventArgs();
+            try
             {
-               Stations = this._RestAlarmContext.DigitalPointInfo
-                    .Where(c => c.StationName.Contains("BK"))
-                    .Where(c => !(string.IsNullOrEmpty(c.MACName))) //same as.Where(c=>!(c.MACName == "" || c.MACName == null)) 
-                                                                    //.Where(c=>c.MACName != "" && c.MACName != null)
-                    .Take(20);
-
-                //Context.RestorationAlarmList.AddRange();
-                //Context.SaveChangesAsync();
-                return Stations.ToList< DigitalPointInfo>();
+                return await _RestAlarmContext.DigitalPointInfo
+                    .Where(c => !(string.IsNullOrEmpty(c.MACName)))
+                    .ToListAsync<DigitalPointInfo>();
+            }
+            catch
+            {
+                args.message = "Read DB Fail";
+                args.TimeStamp = DateTime.Now;
+                onRestAlarmDBChanged(args); //Raise the Event
+                return null;
             }
             
         }
+
 
         #endregion Methode
 

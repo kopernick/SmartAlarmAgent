@@ -9,7 +9,7 @@ using System.IO;
 
 namespace SmartAlarmAgent.Repository
 {
-    class AlarmListCSVRepo
+    public class AlarmListCSVRepo
     {
         
         #region Properties
@@ -48,8 +48,12 @@ namespace SmartAlarmAgent.Repository
         #endregion Properties
 
         #region Event & Delegate
-        public delegate void ReadAlarmListDelegate(object source, EventChangedArgs args);
-        public event ReadAlarmListDelegate ReadAlarmListCSV;
+        public event EventHandler<RestEventArgs> RestAlarmCSVChanged;
+        private void onRestAlarmCSVChanged(RestEventArgs arg)
+        {
+            if (RestAlarmCSVChanged != null)
+                RestAlarmCSVChanged(null, arg);
+        }
         #endregion Event & Delegate
 
         #region Constructor
@@ -77,7 +81,7 @@ namespace SmartAlarmAgent.Repository
 
         private bool exeGetAlarmListCSV()
         {
-            EventChangedArgs args = new EventChangedArgs();
+            RestEventArgs args = new RestEventArgs();
 
             this._listAlarm.Clear();
             try
@@ -91,11 +95,10 @@ namespace SmartAlarmAgent.Repository
                             .Select(line => AlarmList.GetLineAlarmListCsv(line))
                             .ToList();
 
-                this.dLastLoadDB = DateTime.Now;
-                args.Status = "Read Success";
+                this.dLastReadCSV = DateTime.Now;
+                args.message = "Read CSV Success";
                 args.TimeStamp = this.dLastReadCSV;
-                this.dLastReadCSV = args.TimeStamp;
-                onReadAlarmListCSV(args); //Raise the Event
+                onRestAlarmCSVChanged(args); //Raise the Event
               
                 return true;
 #else
@@ -138,10 +141,10 @@ namespace SmartAlarmAgent.Repository
             catch (Exception e)
             {
                 Console.WriteLine(e.ToString());
-                args.Status = "Read Not Success";
+                args.message = "Read CSV Fail";
                 args.TimeStamp = DateTime.Now;
-                    //this.m_dLastReadCSV = args.TimeStamp;
-                onReadAlarmListCSV(args); //Raise the Event
+                //this.m_dLastReadCSV = args.TimeStamp;
+                onRestAlarmCSVChanged(args); //Raise the Event
                 return false;
             }
         }
@@ -170,10 +173,6 @@ namespace SmartAlarmAgent.Repository
             return this._bFlgFileIsLocked = false; //File isn't Locked
         }
 
-        protected virtual void onReadAlarmListCSV(EventChangedArgs args)
-        {
-            ReadAlarmListCSV?.Invoke(this, args);
-        }
         #endregion Methode
     }
 }

@@ -69,7 +69,7 @@
     <Compile Include="Model\Enum.cs" />
     <Compile Include="Repository\AlarmListCSVRepo.cs" />
     <Compile Include="Repository\RestorationAlarmDBRepo.cs" />
-    <Compile Include="Service\EventChangedArgs.cs" />
+    <Compile Include="Service\RestEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
