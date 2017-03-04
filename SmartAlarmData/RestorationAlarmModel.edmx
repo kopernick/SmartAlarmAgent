@@ -71,7 +71,7 @@
           <Key>
             <PropertyRef Name="PkAlarmListID" />
           </Key>
-          <Property Name="PkAlarmListID" Type="int" Nullable="false" />
+          <Property Name="PkAlarmListID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DateTime" Type="datetime" />
           <Property Name="PointType" Type="tinyint" />
           <Property Name="FkIndexID" Type="int" />

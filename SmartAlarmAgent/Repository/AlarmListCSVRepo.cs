@@ -7,6 +7,7 @@ using SmartAlarmAgent.Model;
 using SmartAlarmAgent.Service;
 using System.IO;
 using System.Threading;
+using SmartAlarmData;
 
 namespace SmartAlarmAgent.Repository
 {
@@ -18,11 +19,6 @@ namespace SmartAlarmAgent.Repository
         public int nLastAlarmRecIndex
         {
             get { return _nLastAlarmRecIndex; }
-        }
-        private int _nNewRestPoint;
-        public int nNewRestPoint
-        {
-            get { return _nNewRestPoint; }
         }
 
         public DateTime dLastLoadDB { get; set; }
@@ -38,6 +34,16 @@ namespace SmartAlarmAgent.Repository
         public int nLastRestAlarmID
         {
             get { return _nLastRestAlarmID; }
+        }
+
+        private int _nStartIndex;
+        public int nStartIndex
+        {
+            get { return _nStartIndex; }
+            set
+            {
+                _nStartIndex = value;
+            }
         }
 
         private List<AlarmList> _listAlarm;
@@ -62,10 +68,9 @@ namespace SmartAlarmAgent.Repository
         {
 
             this.dLastLoadDB = DateTime.Now;
-
             this._nLastAlarmRecIndex = -1;
-            this._nNewRestPoint = 0;
             this._nLastRestAlarmID = 0;
+            this._nStartIndex = -1;
 
             this._listAlarm = new List<AlarmList>();
 
@@ -74,12 +79,12 @@ namespace SmartAlarmAgent.Repository
         #endregion Constructor
 
         #region Methode
-        public async Task<bool> GetInitAlarmListAsync()
+        public async Task<List<AlarmList>> GetInitAlarmListAsync()
         {
             return await Task.Run(() => exeGetInitAlarmListCSV());
         }
 
-        private bool exeGetInitAlarmListCSV()
+        private List<AlarmList> exeGetInitAlarmListCSV()
         {
             RestEventArgs args = new RestEventArgs();
 
@@ -87,7 +92,8 @@ namespace SmartAlarmAgent.Repository
 
             try
             {
-                string csvFile = @"\\10.20.86.210\ExportDB\AlarmList2.csv";
+                string csvFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
+               // string csvFile = @"c:\ExportDB\AlarmList.csv";
 
 
 #if true
@@ -99,17 +105,16 @@ namespace SmartAlarmAgent.Repository
                     if (nRetry_read++ >= 10) break;
                 } while (IsFileLocked(csvFile));
 
-                this._listAlarm = File.ReadLines(csvFile)
-                            .Skip(1)
-                            .Select(line => AlarmList.GetLineAlarmListCsv(line))
-                            .ToList();
-
-                this.dLastReadCSV = DateTime.Now;
+                dLastReadCSV = DateTime.Now;
                 args.message = "Read CSV Success";
                 args.TimeStamp = this.dLastReadCSV;
                 onRestAlarmCSVChanged(args); //Raise the Event
-              
-                return true;
+
+                return this._listAlarm = File.ReadLines(csvFile)
+                            .Skip(1)
+                            .Select(line => AlarmList.GetLineAlarmListCsv(line))
+                            .ToList();
+ 
 #else
                 //Oldcode
                 DataTable dt = new DataTable("AlarmList");
@@ -154,31 +159,61 @@ namespace SmartAlarmAgent.Repository
                 args.TimeStamp = DateTime.Now;
                 //this.m_dLastReadCSV = args.TimeStamp;
                 onRestAlarmCSVChanged(args); //Raise the Event
-                return false;
+                return null;
             }
         }
 
         public async Task<bool> GetNewAlarmListAsync()
         {
-            return await Task.Run(() => exeGetNewtAlarmListCSV());
+            if (exeGetInitAlarmListCSV() == null)
+                    return false;                   //Can't Read CSV file
+
+            return await Task.Run(() => exeGetNewAlarmListCSV());
         }
-        private bool exeGetNewtAlarmListCSV()
+
+
+        private bool exeGetNewAlarmListCSV()
         {
-            //int iStartIndex = 0;
-            //this.m_nNewRestPoint = 0;
+            RestEventArgs args = new RestEventArgs();
 
-            //if (this.m_nLastAlarmRecIndex >= 0) //If Start program m_nLastAlarmRecIndex is set to -1 see also Alarm4Restoration()
-            //{
-            //    for (int iIndex = 0; iIndex < this.m_listAlarm.Count; iIndex++)
-            //    {
-            //        DigitalAlarm al = this.m_listAlarm[iIndex];
-            //        if (al.RecIndex != this.m_nLastAlarmRecIndex) continue;
-            //        iStartIndex = (iIndex) % this.m_listAlarm.Count;  // New Incoming Alarm Star here.
-            //        break;
-            //    }
-            //}
+            int iStartIndex = 0;
+            
+            if (this._nLastAlarmRecIndex >= 0) //If Start program m_nLastAlarmRecIndex is set to -1 see also Alarm4Restoration()
+            {
+                for (int iIndex = 0; iIndex < this._listAlarm.Count; iIndex++)
+                {
+                    var al = this._listAlarm[iIndex];
+                    if (al.RecIndex != this._nLastAlarmRecIndex) continue;
 
-            return true;
+                    iStartIndex = (iIndex) % this._listAlarm.Count;  // New Incoming Alarm Star here. ListAlarm.Count = 20,000 
+                    if (this._nStartIndex == iStartIndex)
+                    {
+                        args.message = "Has No New Alarm";
+                        args.TimeStamp = DateTime.Now;
+                        onRestAlarmCSVChanged(args); 
+
+                        break;//Same Position in CSV Has no New Alarm
+                    }
+
+                    this._nStartIndex = iStartIndex;
+                    this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
+
+                    args.message = "Has New Alarm";
+                    args.TimeStamp = DateTime.Now;
+                    onRestAlarmCSVChanged(args); //Raise the Event when has new event
+                    break;
+                }
+            }else
+            {
+                if(this._listAlarm != null || this._listAlarm.Count != 0)
+                    this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
+
+                args.message = "Start Process";
+                args.TimeStamp = DateTime.Now;
+                onRestAlarmCSVChanged(args); //Raise the Event when has new event
+            }
+            
+            return iStartIndex != 0 ;
         }
         private bool IsFileLocked(string path)
         {
@@ -206,6 +241,34 @@ namespace SmartAlarmAgent.Repository
             }
 
             return this._bFlgFileIsLocked = false; //File isn't Locked
+        }
+
+        public RestorationAlarmList GetRestorationAlarmPoint(AlarmList al, IEnumerable<DigitalPointInfo> groupByStations)
+        {
+            var RestorationAlarm = new RestorationAlarmList();
+
+            var pointInfo = groupByStations.Where(c => c.PointName.Trim() == al.PointName.Trim()).FirstOrDefault();
+
+            if (pointInfo == null) return null;
+
+            RestorationAlarm.DateTime = al.Time;
+            RestorationAlarm.PointType = (Byte)al.pointType;
+            RestorationAlarm.FkIndexID = (int)al.FkIndex;
+            RestorationAlarm.StationName = al.StationName;
+            RestorationAlarm.PointName = al.PointName;
+            RestorationAlarm.AlarmType = (int)al.AlarmType;
+            RestorationAlarm.Flashing = al.Flashing;
+            RestorationAlarm.ActualValue = al.ActualValue;
+            RestorationAlarm.Message = al.Message;
+            RestorationAlarm.SourceName = al.SourceName;
+            RestorationAlarm.SourceID = al.SourceID;
+            RestorationAlarm.SourceType = (Byte)al.SourceType;
+            RestorationAlarm.AlarmFlag = (Byte)al.AlarmFlag;
+            RestorationAlarm.DeviceType = pointInfo.DeviceType;
+            RestorationAlarm.MACName = pointInfo.MACName;
+            RestorationAlarm.Priority = pointInfo.Priority;
+
+            return RestorationAlarm;
         }
 
         #endregion Methode

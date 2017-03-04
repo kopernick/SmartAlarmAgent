@@ -6,12 +6,13 @@ using System.Threading.Tasks;
 using SmartAlarmData;
 using System.Data.Entity;
 using SmartAlarmAgent.Service;
+using SmartAlarmAgent.Model;
 
 namespace SmartAlarmAgent.Repository
 {
-    public class RestorationAlarmDBRepo
+     class RestorationAlarmDBRepo
     {
-        #region Prooerties
+        #region Properties
 
         private RestorationAlarmDbContext _RestAlarmContext;
         public RestorationAlarmDbContext RestAlarmContext
@@ -75,6 +76,11 @@ namespace SmartAlarmAgent.Repository
 
             }
             
+        }
+ 
+        public void Complete()
+        {
+            RestAlarmContext.SaveChanges();
         }
 
 

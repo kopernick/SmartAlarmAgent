@@ -7,18 +7,29 @@ using SmartAlarmData;
 using SmartAlarmAgent.Repository;
 using SmartAlarmAgent.Model;
 using SmartAlarmAgent.Service;
+using System.Windows.Threading;
 
 namespace SmartAlarmAgent
 {
      class MainWindowViewModel
     {
-        #region Prooerties
+        #region Properties
+
+        private DispatcherTimer m_dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
+        private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
 
         private List<DigitalPointInfo> _DigitalPointInfoList;
         public List<DigitalPointInfo> DigitalPointInfoList
         {
             get { return _DigitalPointInfoList; }
         }
+
+        private List<AlarmList> _CSVAlarmList;
+        public List<AlarmList> CSVAlarmList
+        {
+            get { return _CSVAlarmList; }
+        }
+
 
         private static AlarmListCSVRepo _mAlarmList;
 
@@ -28,7 +39,18 @@ namespace SmartAlarmAgent
         }
 
         private static RestorationAlarmDBRepo _mRestorationAlarmList;
-        
+
+        private bool _flgMatchingInProgress;
+        public bool flgStart
+        {
+            get { return _flgMatchingInProgress; }
+        }
+
+        private int _nNewRestPoint;
+        public int nNewRestPoint
+        {
+            get { return _nNewRestPoint; }
+        }
         #endregion Properties
 
         #region Constructor
@@ -36,13 +58,24 @@ namespace SmartAlarmAgent
         {
             _mAlarmList = new AlarmListCSVRepo();
             _mRestorationAlarmList = new RestorationAlarmDBRepo();
-
             _mAlarmList.RestAlarmCSVChanged += OnAlarmListChanged;
             _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
-
-            Test_LoadedAsync();
-            Test_DBLoadAsync();
+            _flgMatchingInProgress = false;
+            this._nNewRestPoint = 0;
+            Initializer();
             Console.WriteLine("Skip");
+        }
+
+        private async void Initializer()
+        {
+            var x = await _mAlarmList.GetNewAlarmListAsync();
+            //if (x == false) return;
+            if(_mAlarmList.ListAlarm != null)
+                Console.WriteLine($"Can read CSV Alarm List ? : {_mAlarmList.ListAlarm.Count.ToString()}");
+
+            this.m_dispatcherTimerCSV.Interval = new TimeSpan(0, 0, 30);
+            this.m_dispatcherTimerCSV.Start();
+            this.m_dispatcherTimerCSV.Tick += this.dispatcherTimerCSV_Tick;
 
         }
 
@@ -50,34 +83,6 @@ namespace SmartAlarmAgent
         #endregion Constructor
 
         #region Methode
-        private async void Test_LoadedAsync()
-        {
-            var x = await _mAlarmList.GetInitAlarmListAsync();
-            //Test cw
-            var Station = _mAlarmList.ListAlarm
-                    .Where(c => c.StationName.Contains("BK"))
-                    //.Where(c => !(string.IsNullOrEmpty(c.MACName))) //same as.Where(c=>!(c.MACName == "" || c.MACName == null)) 
-                    //.Where(c=>c.MACName != "" && c.MACName != null)
-                    .Take(20);
-
-            foreach (var item in Station)
-            {
-                Console.WriteLine(item.Time + "," + item.StationName.TrimEnd() + ":" + item.PointName + " " + item.Message);
-            }
-        }
-
-        private async void Test_DBLoadAsync() 
-        {
-           var Stations = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
-            if (Stations == null) return;
-           Console.WriteLine($"Can read Restoration Alarm List ? : {Stations.Count.ToString()}");
-
-            foreach (var item in Stations.Take(20))
-            {
-                Console.WriteLine(item.PkDigitalID + "," + item.StationName.TrimEnd() + ":" + item.PointName + " " + item.MACName);
-            }
-
-        }
 
         private void OnAlarmListChanged(object source, RestEventArgs args)
         {
@@ -94,11 +99,19 @@ namespace SmartAlarmAgent
                     break;
 
                 case "Has New Alarm":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : New Alarm");
+                    Console.WriteLine(args.TimeStamp.ToString() +" : "
+                        + (mAlarmList.ListAlarm.Count - _mAlarmList.nStartIndex - 1).ToString() + " New Alarm(s)");
+                    
+                    this.onHasNewAlarm();
                     break;
 
-                case "Reset":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : Reset CSV");
+                case "Has No New Alarm":
+                    Console.WriteLine(args.TimeStamp.ToString() + " : No New Alarm");
+                    break;
+
+                case "Start Process":
+                    Console.WriteLine(args.TimeStamp.ToString() + " : Start Insert to DB");
+                    this.onHasNewAlarm();
                     break;
 
                 default:
@@ -107,6 +120,60 @@ namespace SmartAlarmAgent
                     break;
             }
         }
+
+        private async void onHasNewAlarm()
+        {
+
+            this._nNewRestPoint = 0;
+
+            List<RestorationAlarmList> RestAlarmList = new List<RestorationAlarmList>();
+            
+            //Refresh Point from Database
+            _DigitalPointInfoList = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
+
+            if (_DigitalPointInfoList == null) 
+                return;                         //Can't Access Database
+
+            _flgMatchingInProgress = true;
+
+            for (int iIndex = _mAlarmList.nStartIndex + 1; iIndex < _mAlarmList.ListAlarm.Count; iIndex++)
+            {
+                AlarmList al = _mAlarmList.ListAlarm[iIndex];
+                if (al.pointType != PointType.Digital) continue;
+
+                var groupByStations = _DigitalPointInfoList.Where(c => c.StationName.Trim() == al.StationName.Trim());// Groupong Station before Mapping
+
+                RestorationAlarmList point = _mAlarmList.GetRestorationAlarmPoint(al, groupByStations); //Mapping CSV Point --> DigitalPointInfo Table
+
+                if (point != null)
+                {
+                    try
+                    {
+                        RestAlarmList.Add(point);
+                        _nNewRestPoint++;
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.ToString());
+
+                    }
+
+                }
+            }
+
+             _mRestorationAlarmList.Complete();
+
+            _flgMatchingInProgress = false;
+
+            Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching Point");
+            Console.WriteLine($"Has {_nNewRestPoint} Restoration Alarm(s)");
+
+            _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count-1;// Index start with 0
+            _mRestorationAlarmList.RestAlarmContext.RestorationAlarmList.AddRange(RestAlarmList);
+           
+        }
+
+
         private void OnDBChanged(object source, RestEventArgs args)
         {
             switch (args.message)
@@ -130,7 +197,18 @@ namespace SmartAlarmAgent
             }
 
         }
-            
+        private async void dispatcherTimerCSV_Tick(object sender, EventArgs e)
+        {
+            if (_flgMatchingInProgress == true)
+            {
+                Console.WriteLine("Under Mactching Point Process");
+                return;
+            }
+
+            var x = await _mAlarmList.GetNewAlarmListAsync();
+
+        }
+
         #endregion Methode
     }
 }

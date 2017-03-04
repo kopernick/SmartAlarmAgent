@@ -102,31 +102,6 @@ namespace SmartAlarmAgent.Model
                 get { return m_nAlarmFlag; }
             }
 
-            private String m_strGroupPointName;
-            public String GroupPointName
-            {
-                get { return m_strGroupPointName; }
-            }
-
-            private String m_strGroupDescription;
-            public String GroupDescription
-            {
-                get { return m_strGroupDescription; }
-            }
-
-            private String m_strPriority;
-            public String Priority
-            {
-                get { return m_strPriority; }
-            }
-
-            private bool m_bIsRestoration;
-            public bool IsRestoration
-            {
-                get { return m_bIsRestoration; }
-            }
-
-
             public AlarmList(DataRow parts)
             {
                 try
