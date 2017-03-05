@@ -68,6 +68,7 @@
     <Compile Include="Model\AlarmList.cs" />
     <Compile Include="Model\Enum.cs" />
     <Compile Include="Repository\AlarmListCSVRepo.cs" />
+    <Compile Include="Repository\RestAlarmDBRepo.cs" />
     <Compile Include="Repository\RestorationAlarmDBRepo.cs" />
     <Compile Include="Service\RestEventArgs.cs" />
     <Page Include="MainWindow.xaml">
@@ -113,6 +114,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\SmartAlarmCFData\SmartAlarmCFData.csproj">
+      <Project>{f5498a81-75cd-4c8e-9fe0-119818e9335b}</Project>
+      <Name>SmartAlarmCFData</Name>
+    </ProjectReference>
     <ProjectReference Include="..\SmartAlarmData\SmartAlarmData.csproj">
       <Project>{734ca420-94e6-4a0b-9af0-5b6de35301b2}</Project>
       <Name>SmartAlarmData</Name>

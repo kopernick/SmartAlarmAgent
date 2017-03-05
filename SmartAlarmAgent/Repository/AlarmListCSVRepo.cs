@@ -102,7 +102,14 @@ namespace SmartAlarmAgent.Repository
                 do //Retry tor Read CSV File 
                 {
                     Thread.Sleep(TimeSpan.FromSeconds(1));
-                    if (nRetry_read++ >= 10) break;
+                    if (nRetry_read++ >= 10)
+                    {
+                        args.message = "Read CSV Fail";
+                        args.TimeStamp = DateTime.Now;
+                        //this.m_dLastReadCSV = args.TimeStamp;
+                        onRestAlarmCSVChanged(args); //Raise the Event
+                        return null;
+                    }
                 } while (IsFileLocked(csvFile));
 
                 dLastReadCSV = DateTime.Now;
@@ -230,8 +237,9 @@ namespace SmartAlarmAgent.Repository
                 Console.WriteLine("Error File not found");
                 return this._bFlgFileIsLocked = true; //File is Locked
             }
-            catch (IOException)
+            catch (Exception e)
             {
+                Console.WriteLine("Error " + e.Message);
                 return this._bFlgFileIsLocked = true; //File is Locked
             }
             finally

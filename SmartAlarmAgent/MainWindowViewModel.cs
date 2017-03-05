@@ -40,6 +40,10 @@ namespace SmartAlarmAgent
 
         private static RestorationAlarmDBRepo _mRestorationAlarmList;
 
+        //Test New EF Code first from exiting DB
+        private static RestAlarmDBRepo _mRestAlarmList;
+
+
         private bool _flgMatchingInProgress;
         public bool flgStart
         {
@@ -58,6 +62,7 @@ namespace SmartAlarmAgent
         {
             _mAlarmList = new AlarmListCSVRepo();
             _mRestorationAlarmList = new RestorationAlarmDBRepo();
+            _mRestAlarmList = new RestAlarmDBRepo();                //Test EF
             _mAlarmList.RestAlarmCSVChanged += OnAlarmListChanged;
             _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
             _flgMatchingInProgress = false;
@@ -73,9 +78,14 @@ namespace SmartAlarmAgent
             if(_mAlarmList.ListAlarm != null)
                 Console.WriteLine($"Can read CSV Alarm List ? : {_mAlarmList.ListAlarm.Count.ToString()}");
 
+            var y = await _mRestAlarmList.GetAllDigitalPointInfoAsync();
+            if (y != null)
+                Console.WriteLine($"Can read Code First DbContext ? : {y.Count.ToString()}");
+
+
             this.m_dispatcherTimerCSV.Interval = new TimeSpan(0, 0, 30);
             this.m_dispatcherTimerCSV.Start();
-            this.m_dispatcherTimerCSV.Tick += this.dispatcherTimerCSV_Tick;
+            this.m_dispatcherTimerCSV.Tick += dispatcherTimerCSV_Tick;
 
         }
 
@@ -202,10 +212,9 @@ namespace SmartAlarmAgent
             if (_flgMatchingInProgress == true)
             {
                 Console.WriteLine("Under Mactching Point Process");
-                return;
+                return ;
             }
-
-            var x = await _mAlarmList.GetNewAlarmListAsync();
+            await Task.Run(() => _mAlarmList.GetNewAlarmListAsync());
 
         }
 
