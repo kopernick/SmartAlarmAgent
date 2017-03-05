@@ -4,7 +4,7 @@
   <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
     <!-- Diagram content (shape and connector positions) -->
     <edmx:Diagrams>
-      <Diagram DiagramId="50a2c8a48fd247dfbe369dd59d4c49c5" Name="Diagram1" ZoomLevel="100">
+      <Diagram DiagramId="50a2c8a48fd247dfbe369dd59d4c49c5" Name="Diagram1" ZoomLevel="56">
         <EntityTypeShape EntityType="RestorationAlarmData.Device" Width="1.5" PointX="0.75" PointY="5.25" IsExpanded="true" />
         <EntityTypeShape EntityType="RestorationAlarmData.DigitalPointInfo" Width="1.5" PointX="3" PointY="1.25" IsExpanded="true" />
         <EntityTypeShape EntityType="RestorationAlarmData.Priority" Width="1.625" PointX="5.75" PointY="1.125" IsExpanded="true" />

@@ -97,7 +97,7 @@ namespace SmartAlarmCFData
         [StringLength(100)]
         public string DeviceType { get; set; }
 
-        [StringLength(100)]
+        [StringLength(255)]
         public string MACName { get; set; }
 
         [StringLength(32)]

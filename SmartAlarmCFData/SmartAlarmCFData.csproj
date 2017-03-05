@@ -56,6 +56,19 @@
   <ItemGroup>
     <Compile Include="Device.cs" />
     <Compile Include="DigitalPointInfo.cs" />
+    <Compile Include="Migrations\201703050834055_InitialMode.cs" />
+    <Compile Include="Migrations\201703050834055_InitialMode.Designer.cs">
+      <DependentUpon>201703050834055_InitialMode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703050837168_ChangeMACNameLengToRestorationAlarmListTable.cs" />
+    <Compile Include="Migrations\201703050837168_ChangeMACNameLengToRestorationAlarmListTable.Designer.cs">
+      <DependentUpon>201703050837168_ChangeMACNameLengToRestorationAlarmListTable.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201703050848006_Test.cs" />
+    <Compile Include="Migrations\201703050848006_Test.Designer.cs">
+      <DependentUpon>201703050848006_Test.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Priority.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -66,6 +79,17 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Migrations\201703050834055_InitialMode.resx">
+      <DependentUpon>201703050834055_InitialMode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703050837168_ChangeMACNameLengToRestorationAlarmListTable.resx">
+      <DependentUpon>201703050837168_ChangeMACNameLengToRestorationAlarmListTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703050848006_Test.resx">
+      <DependentUpon>201703050848006_Test.cs</DependentUpon>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

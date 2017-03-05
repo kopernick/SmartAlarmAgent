@@ -57,7 +57,7 @@
           <Property Name="DateTime" Type="datetime" />
           <Property Name="DeviceID" Type="int" />
           <Property Name="DeviceType" Type="varchar" MaxLength="100" />
-          <Property Name="MACName" Type="varchar" MaxLength="100" />
+          <Property Name="MACName" Type="varchar" MaxLength="255" />
           <Property Name="Priority" Type="char" MaxLength="32" />
         </EntityType>
         <EntityType Name="Priority">
@@ -86,7 +86,7 @@
           <Property Name="SourceType" Type="tinyint" />
           <Property Name="AlarmFlag" Type="tinyint" />
           <Property Name="DeviceType" Type="varchar" MaxLength="100" />
-          <Property Name="MACName" Type="varchar" MaxLength="100" />
+          <Property Name="MACName" Type="varchar" MaxLength="255" />
           <Property Name="Priority" Type="char" MaxLength="32" />
         </EntityType>
         <EntityType Name="Station">
@@ -183,7 +183,7 @@
           <Property Name="DateTime" Type="DateTime" Precision="3" />
           <Property Name="DeviceID" Type="Int32" />
           <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="MACName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MACName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
           <NavigationProperty Name="Device" Relationship="Self.FK_DigitalPointInfo_Device" FromRole="DigitalPointInfo" ToRole="Device" />
         </EntityType>
@@ -213,7 +213,7 @@
           <Property Name="SourceType" Type="Byte" />
           <Property Name="AlarmFlag" Type="Byte" />
           <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
-          <Property Name="MACName" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="MACName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
         </EntityType>
         <EntityType Name="Station">
