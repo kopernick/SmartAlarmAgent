@@ -15,8 +15,8 @@ namespace SmartAlarmAgent
     {
         #region Properties
 
-        private DispatcherTimer m_dispatcherTimer = new System.Windows.Threading.DispatcherTimer();
         private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
+        private DispatcherTimer m_dispatcherTimerDB = new System.Windows.Threading.DispatcherTimer();
 
         private List<DigitalPointInfo> _DigitalPointInfoList;
         public List<DigitalPointInfo> DigitalPointInfoList
@@ -78,17 +78,15 @@ namespace SmartAlarmAgent
             if(_mAlarmList.ListAlarm != null)
                 Console.WriteLine($"Can read CSV Alarm List ? : {_mAlarmList.ListAlarm.Count.ToString()}");
 
-            var y = await _mRestAlarmList.GetAllDigitalPointInfoAsync();
-            if (y != null)
-                Console.WriteLine($"Can read Code First DbContext ? : {y.Count.ToString()}");
-
-
-            this.m_dispatcherTimerCSV.Interval = new TimeSpan(0, 0, 30);
+            this.m_dispatcherTimerCSV.Interval = new TimeSpan(0, 0, 30); //Get Update CSV File Period
             this.m_dispatcherTimerCSV.Start();
             this.m_dispatcherTimerCSV.Tick += dispatcherTimerCSV_Tick;
 
-        }
+            this.m_dispatcherTimerDB.Interval = new TimeSpan(1, 0, 0); //Get Update Database Period
+            this.m_dispatcherTimerDB.Start();
+            this.m_dispatcherTimerDB.Tick += dispatcherTimerDB_Tick;
 
+        }
 
         #endregion Constructor
 
@@ -126,7 +124,6 @@ namespace SmartAlarmAgent
 
                 default:
                     Console.WriteLine(DateTime.Now.ToString() + " : Main Alarm List No Msg. match");
-
                     break;
             }
         }
@@ -216,6 +213,11 @@ namespace SmartAlarmAgent
             }
             await Task.Run(() => _mAlarmList.GetNewAlarmListAsync());
 
+        }
+
+        private void dispatcherTimerDB_Tick(object sender, EventArgs e)
+        {
+            Console.WriteLine(DateTime.Now.ToString() + " : Timer Get Update DB");
         }
 
         #endregion Methode

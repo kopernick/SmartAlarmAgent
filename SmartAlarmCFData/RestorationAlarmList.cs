@@ -41,6 +41,7 @@ namespace SmartAlarmCFData
         public byte? SourceType { get; set; }
 
         public byte? AlarmFlag { get; set; }
+        public int? DeviceID { get; set; }
 
         [StringLength(100)]
         public string DeviceType { get; set; }

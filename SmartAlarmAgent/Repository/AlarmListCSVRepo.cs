@@ -19,8 +19,14 @@ namespace SmartAlarmAgent.Repository
         public int nLastAlarmRecIndex
         {
             get { return _nLastAlarmRecIndex; }
+            set { _nLastAlarmRecIndex = value; }
         }
 
+        private DateTime _CSVLastModify;
+        public DateTime CSVLastModify
+        {
+            get { return _CSVLastModify; }
+        }
         public DateTime dLastLoadDB { get; set; }
         public DateTime dLastReadCSV { get; set; }
         public DateTime dLastInsertRestAlarm { get; set; }
@@ -47,6 +53,7 @@ namespace SmartAlarmAgent.Repository
         }
 
         private List<AlarmList> _listAlarm;
+
         public List<AlarmList> ListAlarm
         {
             get { return _listAlarm; }
@@ -93,10 +100,22 @@ namespace SmartAlarmAgent.Repository
             try
             {
                 string csvFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
-               // string csvFile = @"c:\ExportDB\AlarmList.csv";
+                // string csvFile = @"c:\ExportDB\AlarmList.csv";
 
 
 #if true
+                FileInfo file = new System.IO.FileInfo(csvFile);
+                var DateModification = file.LastWriteTime;
+
+                if (_CSVLastModify == DateModification)
+                {
+                    Console.WriteLine("CSV not Update");
+                    return null;
+                }
+
+                _CSVLastModify = DateModification;
+                Console.WriteLine("CSV Last Modification : "+ DateModification);
+                
                 int nRetry_read = 0;
 
                 do //Retry tor Read CSV File 
@@ -272,6 +291,7 @@ namespace SmartAlarmAgent.Repository
             RestorationAlarm.SourceID = al.SourceID;
             RestorationAlarm.SourceType = (Byte)al.SourceType;
             RestorationAlarm.AlarmFlag = (Byte)al.AlarmFlag;
+            RestorationAlarm.DeviceID = pointInfo.DeviceID;
             RestorationAlarm.DeviceType = pointInfo.DeviceType;
             RestorationAlarm.MACName = pointInfo.MACName;
             RestorationAlarm.Priority = pointInfo.Priority;

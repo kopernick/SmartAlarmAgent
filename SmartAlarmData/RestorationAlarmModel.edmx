@@ -88,6 +88,7 @@
           <Property Name="DeviceType" Type="varchar" MaxLength="100" />
           <Property Name="MACName" Type="varchar" MaxLength="255" />
           <Property Name="Priority" Type="char" MaxLength="32" />
+          <Property Name="DeviceID" Type="int" />
         </EntityType>
         <EntityType Name="Station">
           <Key>
@@ -215,6 +216,7 @@
           <Property Name="DeviceType" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
           <Property Name="MACName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
+          <Property Name="DeviceID" Type="Int32" />
         </EntityType>
         <EntityType Name="Station">
           <Key>
@@ -327,6 +329,7 @@
           <EntitySetMapping Name="RestorationAlarmList">
             <EntityTypeMapping TypeName="RestorationAlarmData.RestorationAlarmList">
               <MappingFragment StoreEntitySet="RestorationAlarmList">
+                <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
                 <ScalarProperty Name="PkAlarmListID" ColumnName="PkAlarmListID" />
                 <ScalarProperty Name="DateTime" ColumnName="DateTime" />
                 <ScalarProperty Name="PointType" ColumnName="PointType" />
