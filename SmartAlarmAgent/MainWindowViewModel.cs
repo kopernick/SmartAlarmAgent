@@ -8,10 +8,12 @@ using SmartAlarmAgent.Repository;
 using SmartAlarmAgent.Model;
 using SmartAlarmAgent.Service;
 using System.Windows.Threading;
+using System.Windows.Controls;
+using System.Collections.ObjectModel;
 
 namespace SmartAlarmAgent
 {
-     class MainWindowViewModel
+     class MainWindowViewModel : PropertyChangeEventBase
     {
         #region Properties
 
@@ -22,6 +24,20 @@ namespace SmartAlarmAgent
         public List<DigitalPointInfo> DigitalPointInfoList
         {
             get { return _DigitalPointInfoList; }
+        }
+
+        private ObservableCollection<string> _ListEventLog;
+        public ObservableCollection<string> ListEventLog {
+            get
+            {
+                return _ListEventLog;
+            }
+            set
+            {
+                _ListEventLog = value;
+                OnPropertyChanged("ListEventLog");
+
+            }
         }
 
         private List<AlarmList> _CSVAlarmList;
@@ -67,8 +83,32 @@ namespace SmartAlarmAgent
             _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
+            ListEventLog = new ObservableCollection<string>();
+            InitializerLogConsole();
+
             Initializer();
+
             Console.WriteLine("Skip");
+        }
+        #endregion Constructor
+
+        #region Methode
+
+        private void InitializerLogConsole()
+        {
+            
+            ListEventLog.Insert((int)EventLogPosition.CSV_STATUS , "Read CSV Success/Fail");
+            ListEventLog.Insert((int)EventLogPosition.CSV_NEW_EVENT , "New Event");
+            ListEventLog.Insert((int)EventLogPosition.REST_NEW_POINT , "--> Restoration Point");
+            ListEventLog.Insert((int)EventLogPosition.SEP_1 , "===========================================");
+            ListEventLog.Insert((int)EventLogPosition.DB_STATUS , "Read Database Success/Fail");
+            ListEventLog.Insert((int)EventLogPosition.DB_TOTAL_POINT , "Total Point ");
+            ListEventLog.Insert((int)EventLogPosition.DB_TOTAL_POINT , "Last Access Database");
+            ListEventLog.Insert((int)EventLogPosition.SEP_2 , "===========================================");
+            ListEventLog.Insert((int)EventLogPosition.MSG_TITLE , "[Message]");
+            ListEventLog.Insert((int)EventLogPosition.ERR_MSG , "Error.....");
+            ListEventLog.Insert((int)EventLogPosition.ETC_STATUS , "Under Matching Point/Other");
+
         }
 
         private async void Initializer()
@@ -88,9 +128,9 @@ namespace SmartAlarmAgent
 
         }
 
-        #endregion Constructor
 
-        #region Methode
+
+
 
         private void OnAlarmListChanged(object source, RestEventArgs args)
         {
@@ -100,16 +140,19 @@ namespace SmartAlarmAgent
 
                 case "Read CSV Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Success");
+
                     break;
 
                 case "Read CSV Fail":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Fail");
+
+
                     break;
 
                 case "Has New Alarm":
                     Console.WriteLine(args.TimeStamp.ToString() +" : "
                         + (mAlarmList.ListAlarm.Count - _mAlarmList.nStartIndex - 1).ToString() + " New Alarm(s)");
-                    
+
                     this.onHasNewAlarm();
                     break;
 
@@ -173,6 +216,7 @@ namespace SmartAlarmAgent
             _flgMatchingInProgress = false;
 
             Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching Point");
+
             Console.WriteLine($"Has {_nNewRestPoint} Restoration Alarm(s)");
 
             _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count-1;// Index start with 0
@@ -180,7 +224,11 @@ namespace SmartAlarmAgent
            
         }
 
-
+        private void updateLogConsole(int Position, string Msg)
+        {
+            ListEventLog.Insert(Position, Msg);
+            ListEventLog.RemoveAt(Position);
+        }
         private void OnDBChanged(object source, RestEventArgs args)
         {
             switch (args.message)
@@ -188,6 +236,7 @@ namespace SmartAlarmAgent
 
                 case "Read DB Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read Database Success");
+                        
                     break;
 
                 case "Read DB Fail":
@@ -208,7 +257,7 @@ namespace SmartAlarmAgent
         {
             if (_flgMatchingInProgress == true)
             {
-                Console.WriteLine("Under Mactching Point Process");
+                Console.WriteLine("Under Matching Point Process");
                 return ;
             }
             await Task.Run(() => _mAlarmList.GetNewAlarmListAsync());

@@ -47,6 +47,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Windows.Controls.Ribbon" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -70,6 +71,7 @@
     <Compile Include="Repository\AlarmListCSVRepo.cs" />
     <Compile Include="Repository\RestAlarmDBRepo.cs" />
     <Compile Include="Repository\RestorationAlarmDBRepo.cs" />
+    <Compile Include="Service\PropertyChangeEventBase.cs" />
     <Compile Include="Service\RestEventArgs.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

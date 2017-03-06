@@ -23,5 +23,20 @@
             SOURCETYPE_FIELD = 13,
             ALARMFLAG_FIELD = 14
         };
+
+    public enum EventLogPosition
+    {
+        CSV_STATUS,
+        CSV_NEW_EVENT,
+        REST_NEW_POINT,
+        SEP_1,
+        DB_STATUS,
+        DB_TOTAL_POINT,
+        DB_LAST_ACCESS,
+        SEP_2,
+        MSG_TITLE,
+        ERR_MSG,
+        ETC_STATUS
+    }
     
 }

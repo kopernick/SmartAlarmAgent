@@ -5,9 +5,197 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SmartAlarmAgent"
         mc:Ignorable="d"
-        Title="SmartAlarm Agent" Height="350" Width="525">
+        Title="SmartAlarm Agent" Height="480" Width="640" ResizeMode="NoResize">
 
     <Grid>
-        
+        <Grid.Resources>
+            <!--
+            <BitmapImage x:Key="OpenFileImage" UriSource = "/EventLogSearching;component/images/OpenFile.png" />
+            <BitmapImage x:Key="searchImage" UriSource = "/EventLogSearching;component/images/search.png" />
+            <BitmapImage x:Key="exportImage" UriSource = "/EventLogSearching;component/images/export.png" />
+            <BitmapImage x:Key="DelImage" UriSource = "/EventLogSearching;component/images/Del.png" />
+             -->
+            </Grid.Resources>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!--ToolBar-->
+        <Ribbon x:Name="RibbonWin" DockPanel.Dock="Top" SelectedIndex="0" Grid.Row="0" Grid.ColumnSpan="2">
+
+            <!-- Application Menu, located at the left-hand side (down arrow) -->
+            <Ribbon.ApplicationMenu>
+                <RibbonApplicationMenu KeyTip="F">
+                    <RibbonApplicationMenuItem Header="Exit" />
+                </RibbonApplicationMenu>
+            </Ribbon.ApplicationMenu>
+
+            <!-- Help Pane, located at the right-hand side -->
+            <Ribbon.HelpPaneContent>
+                <Grid DockPanel.Dock ="Top">
+                    <Grid.ColumnDefinitions >
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Column="0" Grid.Row="0" Margin="10,0"  FontSize="9" Foreground="MediumBlue"
+                           Content="{Binding fileDirectory, UpdateSourceTrigger=PropertyChanged}"/>
+
+
+                </Grid>
+
+            </Ribbon.HelpPaneContent>
+
+            <RibbonTab x:Name="Main" Header="Main">
+
+                <!-- CSV  group-->
+                <RibbonGroup x:Name="CSV" Header="CSV File Info" >
+                    <Grid >
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Column 1 -->
+                        <!-- Row 1 -->
+                        <!-- Row 2 -->
+
+
+
+                        <Label Grid.Column="0" Grid.Row="0"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            File Path:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="0" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding CSVFile, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+                        
+                        <Label Grid.Column="0" Grid.Row="1"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            Lase Modified:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="1" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding CSVLastModified, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+
+                        <Label Grid.Column="0" Grid.Row="3"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            Status:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="3" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding CSVStatus, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+
+                        <!-- Row2 -->
+                    </Grid>
+                </RibbonGroup>
+
+                <!-- Database  group-->
+
+                <RibbonGroup x:Name="Database" Header="Database Info" >
+                    <Grid >
+                        <Grid.ColumnDefinitions >
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Column 1 -->
+                        <!-- Row 1 -->
+                        <!-- Row 2 -->
+
+
+
+                        <Label Grid.Column="0" Grid.Row="0"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            Database:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="0" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding DBName, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+
+                        <Label Grid.Column="0" Grid.Row="1"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            Lase Access:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="1" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding DBLastAccess, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+
+                        <Label Grid.Column="0" Grid.Row="3"  Grid.RowSpan="1" VerticalAlignment="Center" 
+                               FontSize="11" Foreground="Red">
+                            Status:
+                        </Label>
+                        <TextBlock Grid.Column="1" Grid.Row="3" MinWidth="100" Grid.RowSpan="1"  
+                                 Text="{Binding DBStatus, UpdateSourceTrigger=PropertyChanged}" Margin="2">
+                        </TextBlock>
+
+                        <!-- Row2 -->
+                    </Grid>
+                </RibbonGroup>
+            </RibbonTab>
+        </Ribbon>
+
+        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+
+            <Grid DockPanel.Dock ="Top" HorizontalAlignment="Stretch" Width="Auto">
+                <ListView ItemsSource ="{Binding ListEventLog}"
+                      x:Name="LogConsole"  
+                       Margin="5" Cursor="Hand" 
+                         Background="#FF054779" 
+                         Foreground="#FFFCF9F9" FontSize="12"
+                      VirtualizingPanel.ScrollUnit="Pixel" >
+
+                </ListView>
+            </Grid>
+
+        </DockPanel>
+        <DockPanel Grid.Row="1" Grid.Column="1">
+
+            <Grid DockPanel.Dock ="Top" HorizontalAlignment="Stretch" Width="Auto"/>
+
+        </DockPanel>
+        <!-- Status Bar -->
+        <StatusBar Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+
+            <StatusBarItem  Content="{Binding ExpressionTree, UpdateSourceTrigger=PropertyChanged}" Foreground="DarkBlue"/>
+
+        </StatusBar>
+
     </Grid>
 </Window>

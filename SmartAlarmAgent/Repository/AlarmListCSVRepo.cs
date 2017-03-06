@@ -104,7 +104,7 @@ namespace SmartAlarmAgent.Repository
 
 
 #if true
-                FileInfo file = new System.IO.FileInfo(csvFile);
+                FileInfo file = new FileInfo(csvFile);
                 var DateModification = file.LastWriteTime;
 
                 if (_CSVLastModify == DateModification)
