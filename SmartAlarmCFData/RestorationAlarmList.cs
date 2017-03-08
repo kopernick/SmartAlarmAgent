@@ -16,6 +16,9 @@ namespace SmartAlarmCFData
 
         public byte? PointType { get; set; }
 
+        [StringLength(14)]
+        public string ShortName { get; set; }
+
         public int? FkIndexID { get; set; }
 
         [StringLength(15)]

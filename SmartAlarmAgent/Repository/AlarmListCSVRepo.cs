@@ -283,6 +283,7 @@ namespace SmartAlarmAgent.Repository
             RestorationAlarm.FkIndexID = (int)al.FkIndex;
             RestorationAlarm.StationName = al.StationName;
             RestorationAlarm.PointName = al.PointName;
+            RestorationAlarm.ShortName = pointInfo.ShortName;
             RestorationAlarm.AlarmType = (int)al.AlarmType;
             RestorationAlarm.Flashing = al.Flashing;
             RestorationAlarm.ActualValue = al.ActualValue;

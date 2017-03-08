@@ -72,6 +72,10 @@
     <Compile Include="Migrations\201703061233383_AddDeviceIDColunmtoRestorationAlarmListTable.Designer.cs">
       <DependentUpon>201703061233383_AddDeviceIDColunmtoRestorationAlarmListTable.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201703080346106_AddShortNameToRestorationAlarmListTable.cs" />
+    <Compile Include="Migrations\201703080346106_AddShortNameToRestorationAlarmListTable.Designer.cs">
+      <DependentUpon>201703080346106_AddShortNameToRestorationAlarmListTable.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Priority.cs" />
     <Compile Include="Program.cs" />
@@ -96,6 +100,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201703061233383_AddDeviceIDColunmtoRestorationAlarmListTable.resx">
       <DependentUpon>201703061233383_AddDeviceIDColunmtoRestorationAlarmListTable.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201703080346106_AddShortNameToRestorationAlarmListTable.resx">
+      <DependentUpon>201703080346106_AddShortNameToRestorationAlarmListTable.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -140,12 +140,12 @@ namespace SmartAlarmAgent
 
                 case "Read CSV Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Success");
-
+                    //updateLogConsole((int)EventLogPosition.CSV_STATUS, "Read CSV Success");
                     break;
 
                 case "Read CSV Fail":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Fail");
-
+                    //updateLogConsole((int)EventLogPosition.CSV_STATUS , "Read CSV Fail");
 
                     break;
 
@@ -218,6 +218,7 @@ namespace SmartAlarmAgent
             Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching Point");
 
             Console.WriteLine($"Has {_nNewRestPoint} Restoration Alarm(s)");
+            //updateLogConsole((int)EventLogPosition.REST_NEW_POINT, $"Has {_nNewRestPoint} Restoration Alarm(s)");
 
             _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count-1;// Index start with 0
             _mRestorationAlarmList.RestAlarmContext.RestorationAlarmList.AddRange(RestAlarmList);

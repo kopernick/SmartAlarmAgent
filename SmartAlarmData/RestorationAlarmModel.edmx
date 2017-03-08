@@ -85,10 +85,11 @@
           <Property Name="SourceID" Type="int" />
           <Property Name="SourceType" Type="tinyint" />
           <Property Name="AlarmFlag" Type="tinyint" />
+          <Property Name="DeviceID" Type="int" />
           <Property Name="DeviceType" Type="varchar" MaxLength="100" />
           <Property Name="MACName" Type="varchar" MaxLength="255" />
           <Property Name="Priority" Type="char" MaxLength="32" />
-          <Property Name="DeviceID" Type="int" />
+          <Property Name="ShortName" Type="nvarchar" MaxLength="14" />
         </EntityType>
         <EntityType Name="Station">
           <Key>
@@ -217,6 +218,7 @@
           <Property Name="MACName" Type="String" MaxLength="255" FixedLength="false" Unicode="false" />
           <Property Name="Priority" Type="String" MaxLength="32" FixedLength="true" Unicode="false" />
           <Property Name="DeviceID" Type="Int32" />
+          <Property Name="ShortName" Type="String" MaxLength="14" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="Station">
           <Key>
@@ -329,6 +331,7 @@
           <EntitySetMapping Name="RestorationAlarmList">
             <EntityTypeMapping TypeName="RestorationAlarmData.RestorationAlarmList">
               <MappingFragment StoreEntitySet="RestorationAlarmList">
+                <ScalarProperty Name="ShortName" ColumnName="ShortName" />
                 <ScalarProperty Name="DeviceID" ColumnName="DeviceID" />
                 <ScalarProperty Name="PkAlarmListID" ColumnName="PkAlarmListID" />
                 <ScalarProperty Name="DateTime" ColumnName="DateTime" />

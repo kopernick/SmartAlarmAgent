@@ -32,5 +32,6 @@ namespace SmartAlarmData
         public string MACName { get; set; }
         public string Priority { get; set; }
         public Nullable<int> DeviceID { get; set; }
+        public string ShortName { get; set; }
     }
 }

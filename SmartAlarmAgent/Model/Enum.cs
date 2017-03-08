@@ -37,6 +37,6 @@
         MSG_TITLE,
         ERR_MSG,
         ETC_STATUS
-    }
+    };
     
 }
