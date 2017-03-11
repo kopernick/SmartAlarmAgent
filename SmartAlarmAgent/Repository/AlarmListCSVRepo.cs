@@ -278,26 +278,37 @@ namespace SmartAlarmAgent.Repository
 
             if (pointInfo == null) return null;
 
-            RestorationAlarm.DateTime = al.Time;
-            RestorationAlarm.PointType = (Byte)al.pointType;
-            RestorationAlarm.FkIndexID = (int)al.FkIndex;
-            RestorationAlarm.StationName = al.StationName;
-            RestorationAlarm.PointName = al.PointName;
-            RestorationAlarm.ShortName = pointInfo.ShortName;
-            RestorationAlarm.AlarmType = (int)al.AlarmType;
-            RestorationAlarm.Flashing = al.Flashing;
-            RestorationAlarm.ActualValue = al.ActualValue;
-            RestorationAlarm.Message = al.Message;
-            RestorationAlarm.SourceName = al.SourceName;
-            RestorationAlarm.SourceID = al.SourceID;
-            RestorationAlarm.SourceType = (Byte)al.SourceType;
-            RestorationAlarm.AlarmFlag = (Byte)al.AlarmFlag;
-            RestorationAlarm.DeviceID = pointInfo.DeviceID;
-            RestorationAlarm.DeviceType = pointInfo.DeviceType;
-            RestorationAlarm.MACName = pointInfo.MACName;
-            RestorationAlarm.Priority = pointInfo.Priority;
+            try
+            {
+                
 
-            return RestorationAlarm;
+                RestorationAlarm.DateTime = al.Time;
+                RestorationAlarm.PointType = (Byte)al.pointType;
+                RestorationAlarm.FkIndexID = (int)al.FkIndex;
+                RestorationAlarm.StationName = al.StationName;
+                RestorationAlarm.PointName = al.PointName;
+                RestorationAlarm.ShortName = pointInfo.ShortName;
+                RestorationAlarm.AlarmType = (int)al.AlarmType;
+                RestorationAlarm.Flashing = al.Flashing;
+                RestorationAlarm.ActualValue = al.ActualValue;
+                RestorationAlarm.Message = al.Message;
+                RestorationAlarm.SourceName = al.SourceName;
+                RestorationAlarm.SourceID = al.SourceID;
+                RestorationAlarm.SourceType = (Byte)al.SourceType;
+                RestorationAlarm.AlarmFlag = (Byte)al.AlarmFlag;
+                RestorationAlarm.DeviceID = pointInfo.DeviceID;
+                RestorationAlarm.DeviceType = pointInfo.DeviceType;
+                RestorationAlarm.MACName = pointInfo.MACName;
+                RestorationAlarm.Priority = pointInfo.Priority;
+
+                return RestorationAlarm;
+            }
+            catch
+            {
+                Console.WriteLine($"Convertion Error");
+                return null;
+            }
+            
         }
 
         #endregion Methode
