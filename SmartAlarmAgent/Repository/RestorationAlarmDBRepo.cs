@@ -77,7 +77,39 @@ namespace SmartAlarmAgent.Repository
             }
             
         }
- 
+
+        public async Task<List<RestorationAlarmList>> GetRestorationAlarmListAsync()
+        {
+            RestEventArgs args = new RestEventArgs();
+
+            try
+            {
+                args.message = "Read DB Success";
+                args.TimeStamp = DateTime.Now;
+
+                return await _RestAlarmContext.RestorationAlarmList
+                    .OrderByDescending(c=>c.DateTime)
+                    .ToListAsync();
+
+                //var LastRestAlarmPoint = _RestAlarmContext.RestorationAlarmList.LastOrDefault();
+                //return LastRestAlarmPoint;
+            }
+            catch
+            {
+                args.message = "Read DB Fail";
+                args.TimeStamp = DateTime.Now;
+                return null;
+
+            }
+            finally
+            {
+                //Send Event after Get All DigitalInfo
+                onRestAlarmDBChanged(args); //Raise the Event
+
+            }
+
+        }
+
         public void Complete()
         {
             RestAlarmContext.SaveChanges();

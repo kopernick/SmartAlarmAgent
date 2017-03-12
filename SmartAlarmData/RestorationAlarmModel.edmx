@@ -77,6 +77,7 @@
           <Property Name="FkIndexID" Type="int" />
           <Property Name="StationName" Type="char" MaxLength="15" />
           <Property Name="PointName" Type="char" MaxLength="40" />
+          <Property Name="ShortName" Type="nvarchar" MaxLength="14" />
           <Property Name="AlarmType" Type="int" />
           <Property Name="Flashing" Type="tinyint" />
           <Property Name="ActualValue" Type="float" />
@@ -89,7 +90,6 @@
           <Property Name="DeviceType" Type="varchar" MaxLength="100" />
           <Property Name="MACName" Type="varchar" MaxLength="255" />
           <Property Name="Priority" Type="char" MaxLength="32" />
-          <Property Name="ShortName" Type="nvarchar" MaxLength="14" />
         </EntityType>
         <EntityType Name="Station">
           <Key>

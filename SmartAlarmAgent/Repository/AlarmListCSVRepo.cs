@@ -212,6 +212,7 @@ namespace SmartAlarmAgent.Repository
                     if (al.RecIndex != this._nLastAlarmRecIndex) continue;
 
                     iStartIndex = (iIndex) % this._listAlarm.Count;  // New Incoming Alarm Star here. ListAlarm.Count = 20,000 
+
                     if (this._nStartIndex == iStartIndex)
                     {
                         args.message = "Has No New Alarm";
@@ -231,7 +232,7 @@ namespace SmartAlarmAgent.Repository
                 }
             }else
             {
-                if(this._listAlarm != null || this._listAlarm.Count != 0)
+                if(!(this._listAlarm == null || this._listAlarm.Count == 0))
                     this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
 
                 args.message = "Start Process";
@@ -241,6 +242,7 @@ namespace SmartAlarmAgent.Repository
             
             return iStartIndex != 0 ;
         }
+
         private bool IsFileLocked(string path)
         {
             FileInfo file = new FileInfo(path);
@@ -281,7 +283,6 @@ namespace SmartAlarmAgent.Repository
             try
             {
                 
-
                 RestorationAlarm.DateTime = al.Time;
                 RestorationAlarm.PointType = (Byte)al.pointType;
                 RestorationAlarm.FkIndexID = (int)al.FkIndex;
