@@ -6,7 +6,8 @@ namespace SmartAlarmAgent.Service
     {
             public string message { get; set; }
             public DateTime TimeStamp { get; set; }
-        
-  }
+            public int? UpdatePost { get; set; }
+
+    }
     
 }

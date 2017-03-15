@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SmartAlarmAgent"
+        xmlns:Activity="clr-namespace:SmartAlarmAgent.Views"
         mc:Ignorable="d"
-        Title="SmartAlarm Agent" Height="480" Width="640" ResizeMode="NoResize">
+        Title="SmartAlarm Agent" Height="480" Width="640" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.Resources>
@@ -173,16 +174,7 @@
 
         <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
 
-            <Grid DockPanel.Dock ="Top" HorizontalAlignment="Stretch" Width="Auto">
-                <ListView ItemsSource ="{Binding ListEventLog}"
-                      x:Name="LogConsole"  
-                       Margin="5" Cursor="Hand" 
-                         Background="#FF054779" 
-                         Foreground="#FFFCF9F9" FontSize="12"
-                      VirtualizingPanel.ScrollUnit="Pixel" >
-
-                </ListView>
-            </Grid>
+            <Activity:ActivityMonitorView Grid.Column="0" x:Name="MainView" Margin="2" HorizontalAlignment="Stretch" Width="Auto"/>
 
         </DockPanel>
         <DockPanel Grid.Row="1" Grid.Column="1">
@@ -196,6 +188,14 @@
             <StatusBarItem  Content="{Binding ExpressionTree, UpdateSourceTrigger=PropertyChanged}" Foreground="DarkBlue"/>
 
         </StatusBar>
+        
+        <StatusBarItem Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2">
+            <StackPanel Orientation="Horizontal">
+                <Label Content="Current RecIndex:"/>
+                <Label x:Name="curRecIndex" Margin="10,0" 
+                       Content ="{Binding nLastAlarmRecIndex}"/>
+            </StackPanel>
+        </StatusBarItem>
 
     </Grid>
 </Window>

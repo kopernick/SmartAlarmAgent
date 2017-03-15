@@ -62,7 +62,7 @@ namespace SmartAlarmAgent.Repository
         #endregion Properties
 
         #region Event & Delegate
-        public event EventHandler<RestEventArgs> RestAlarmCSVChanged;
+        public static event EventHandler<RestEventArgs> RestAlarmCSVChanged;
         private void onRestAlarmCSVChanged(RestEventArgs arg)
         {
             if (RestAlarmCSVChanged != null)
@@ -86,14 +86,15 @@ namespace SmartAlarmAgent.Repository
         #endregion Constructor
 
         #region Methode
-        public async Task<List<AlarmList>> GetInitAlarmListAsync()
+        public async Task<List<AlarmList>> GetAlarmListCSVAsync()
         {
-            return await Task.Run(() => exeGetInitAlarmListCSV());
+            return await Task.Run(() => exeGetListCSV());
         }
 
-        private List<AlarmList> exeGetInitAlarmListCSV()
+        public List<AlarmList> exeGetListCSV()
         {
             RestEventArgs args = new RestEventArgs();
+            args.UpdatePost = (int)EventLogPosition.CSV_STATUS;
 
             this._listAlarm.Clear();
 
@@ -125,21 +126,24 @@ namespace SmartAlarmAgent.Repository
                     {
                         args.message = "Read CSV Fail";
                         args.TimeStamp = DateTime.Now;
+                        //args.UpdatePost = (int)EventLogPosition.CSV_STATUS;
                         //this.m_dLastReadCSV = args.TimeStamp;
                         onRestAlarmCSVChanged(args); //Raise the Event
                         return null;
                     }
                 } while (IsFileLocked(csvFile));
 
+                this._listAlarm = File.ReadLines(csvFile)
+                            .Skip(1)
+                            .Select(line => AlarmList.GetLineAlarmListCsv(line))
+                            .ToList();
+
                 dLastReadCSV = DateTime.Now;
                 args.message = "Read CSV Success";
                 args.TimeStamp = this.dLastReadCSV;
                 onRestAlarmCSVChanged(args); //Raise the Event
 
-                return this._listAlarm = File.ReadLines(csvFile)
-                            .Skip(1)
-                            .Select(line => AlarmList.GetLineAlarmListCsv(line))
-                            .ToList();
+                return this._listAlarm;
  
 #else
                 //Oldcode
@@ -189,16 +193,13 @@ namespace SmartAlarmAgent.Repository
             }
         }
 
-        public async Task<bool> GetNewAlarmListAsync()
+        public async Task<bool> CheckNewAlarmListAsync()
         {
-            if (exeGetInitAlarmListCSV() == null)
-                    return false;                   //Can't Read CSV file
-
-            return await Task.Run(() => exeGetNewAlarmListCSV());
+            return await Task.Run(() => exeCheckNewAlarmListCSV());
         }
 
 
-        private bool exeGetNewAlarmListCSV()
+        private bool exeCheckNewAlarmListCSV()
         {
             RestEventArgs args = new RestEventArgs();
 
@@ -230,7 +231,8 @@ namespace SmartAlarmAgent.Repository
                     onRestAlarmCSVChanged(args); //Raise the Event when has new event
                     break;
                 }
-            }else
+            }
+            else
             {
                 if(!(this._listAlarm == null || this._listAlarm.Count == 0))
                     this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index

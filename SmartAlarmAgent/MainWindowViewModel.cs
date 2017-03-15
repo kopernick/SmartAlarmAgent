@@ -20,47 +20,22 @@ namespace SmartAlarmAgent
         private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
         private DispatcherTimer m_dispatcherTimerDB = new System.Windows.Threading.DispatcherTimer();
 
-        private readonly List<RestorationAlarmList> RestAlarmList = new List<RestorationAlarmList>();
+        private DataProcessLogic DataProcessor = new DataProcessLogic();
 
-        private List<DigitalPointInfo> _DigitalPointInfoList;
-        public List<DigitalPointInfo> DigitalPointInfoList
-        {
-            get { return _DigitalPointInfoList; }
-        }
-
-        private ObservableCollection<string> _ListEventLog;
-        public ObservableCollection<string> ListEventLog {
-            get
+        private int _nLastAlarmRecIndex;
+        public int nLastAlarmRecIndex
+        { get
             {
-                return _ListEventLog;
+                return _nLastAlarmRecIndex;
             }
             set
             {
-                _ListEventLog = value;
-                OnPropertyChanged("ListEventLog");
-
+                _nLastAlarmRecIndex = value;
+                //OnPropertyChanged("nLastAlarmRecIndex");
             }
         }
 
-        private List<AlarmList> _CSVAlarmList;
-        public List<AlarmList> CSVAlarmList
-        {
-            get { return _CSVAlarmList; }
-        }
-
-
-        private static AlarmListCSVRepo _mAlarmList;
-
-        public AlarmListCSVRepo mAlarmList
-        {
-            get { return _mAlarmList; }
-        }
-
-        private static RestorationAlarmDBRepo _mRestorationAlarmList;
-
-        //Test New EF Code first from exiting DB
-        private static RestAlarmDBRepo _mRestAlarmList;
-
+       
 
         private bool _flgMatchingInProgress;
         public bool flgStart
@@ -78,229 +53,35 @@ namespace SmartAlarmAgent
         #region Constructor
         public MainWindowViewModel()
         {
-            _mAlarmList = new AlarmListCSVRepo();
-            _mRestorationAlarmList = new RestorationAlarmDBRepo();
-            _mRestAlarmList = new RestAlarmDBRepo();                //Test EF
-            _mAlarmList.RestAlarmCSVChanged += OnAlarmListChanged;
-            _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
+            
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
-            ListEventLog = new ObservableCollection<string>();
-            InitializerLogConsole();
 
             Initializer();
-
             Console.WriteLine("Skip");
         }
         #endregion Constructor
 
+       
+        
         #region Methode
-
-        private void InitializerLogConsole()
-        {
-            
-            ListEventLog.Insert((int)EventLogPosition.CSV_STATUS , "Read CSV Success/Fail");
-            ListEventLog.Insert((int)EventLogPosition.CSV_NEW_EVENT , "New Event");
-            ListEventLog.Insert((int)EventLogPosition.REST_NEW_POINT , "--> Restoration Point");
-            ListEventLog.Insert((int)EventLogPosition.SEP_1 , "===========================================");
-            ListEventLog.Insert((int)EventLogPosition.DB_STATUS , "Read Database Success/Fail");
-            ListEventLog.Insert((int)EventLogPosition.DB_TOTAL_POINT , "Total Point ");
-            ListEventLog.Insert((int)EventLogPosition.DB_TOTAL_POINT , "Last Access Database");
-            ListEventLog.Insert((int)EventLogPosition.SEP_2 , "===========================================");
-            ListEventLog.Insert((int)EventLogPosition.MSG_TITLE , "[Message]");
-            ListEventLog.Insert((int)EventLogPosition.ERR_MSG , "Error.....");
-            ListEventLog.Insert((int)EventLogPosition.ETC_STATUS , "Under Matching Point/Other");
-
-        }
 
         private async void Initializer()
         {
-            var x = await _mAlarmList.GetNewAlarmListAsync(); //Start Get CSV
-            //if (x == false) return;
-            if(_mAlarmList.ListAlarm != null)
-                Console.WriteLine($"Can read CSV Alarm List ? : {_mAlarmList.ListAlarm.Count.ToString()}");
+            await Task.Run(() => DataProcessor.GetCSVData());
 
             this.m_dispatcherTimerCSV.Interval = new TimeSpan(0, 0, 30); //Get Update CSV File Period
             this.m_dispatcherTimerCSV.Start();
             this.m_dispatcherTimerCSV.Tick += dispatcherTimerCSV_Tick;
 
-            this.m_dispatcherTimerDB.Interval = new TimeSpan(1, 0, 0); //Get Update Database Period
-            this.m_dispatcherTimerDB.Start();
-            this.m_dispatcherTimerDB.Tick += dispatcherTimerDB_Tick;
+            //this.m_dispatcherTimerDB.Interval = new TimeSpan(1, 0, 0); //Get Update Database Period
+            //this.m_dispatcherTimerDB.Start();
+            //this.m_dispatcherTimerDB.Tick += dispatcherTimerDB_Tick;
+            this.nLastAlarmRecIndex = DataProcessor.nLastAlarmRecIndex;
 
         }
 
-
-
-
-
-        private async void OnAlarmListChanged(object source, RestEventArgs args)
-        {
-            // throw new NotImplementedException();
-            switch (args.message)
-            {
-
-                case "Read CSV Success":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Success");
-                    //updateLogConsole((int)EventLogPosition.CSV_STATUS, "Read CSV Success");
-                    break;
-
-                case "Read CSV Fail":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Fail");
-                    //updateLogConsole((int)EventLogPosition.CSV_STATUS , "Read CSV Fail");
-
-                    break;
-
-                case "Has New Alarm":
-                    Console.WriteLine(args.TimeStamp.ToString() +" : "
-                        + (mAlarmList.ListAlarm.Count - _mAlarmList.nStartIndex - 1).ToString() + " New Alarm(s)");
-
-                    await this.onHasNewAlarm();
-                    break;
-
-                case "Has No New Alarm":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : No New Alarm");
-                    break;
-
-                case "Start Process": 
-                    Console.WriteLine(args.TimeStamp.ToString() + " : Start Insert to DB");
-                    //this.onHasNewAlarm();
-                    await this.onStartProcess();
-                    break;
-
-                default:
-                    Console.WriteLine(DateTime.Now.ToString() + " : Main Alarm List No Msg. match");
-                    break;
-            }
-        }
-
-        private async Task<bool> onStartProcess()
-        {
-            this._nNewRestPoint = 0;
-
-            this.RestAlarmList.Clear();
-
-            //Refresh Point from Database
-            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListAsync();
-
-            if (RestAlarmPointList == null) //Can't Access Database
-                return false; 
-
-            if(RestAlarmPointList.Count == 0) //Empty Database
-            {
-                //Refresh Point from Database
-                _DigitalPointInfoList = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
-
-                if (_DigitalPointInfoList == null)
-                    return false;                         //Can't Access Database
-
-                return await Task.Run(() => ProcessPoint(_mAlarmList.nStartIndex));
-            }
-
-            var LastRestAlarmPoint = RestAlarmPointList.FirstOrDefault();
-
-            if (LastRestAlarmPoint == null)
-                    return false;                                
-
-            //Step 1 Compare Last DigitalPointInfoList Point
-            int StartIndex = 0;
-            AlarmList StartPoint = null; 
-
-            foreach (var item in _mAlarmList.ListAlarm)
-            {
-                StartIndex++;
-
-                if (item.StationName.Trim() != LastRestAlarmPoint.StationName.Trim())
-                    continue;
-                if (item.PointName.Trim() != LastRestAlarmPoint.PointName.Trim())
-                    continue;
-                if (item.Time == LastRestAlarmPoint.DateTime)
-                {
-                    StartPoint = item; //Start Position
-                    break;
-                }
-                    
-            }
-
-            if (StartPoint == null)     //No Match point
-                StartIndex = 0;
-
-            //Refresh Point from Database
-            _DigitalPointInfoList = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
-
-            if (_DigitalPointInfoList == null)
-                return false;                         //Can't Access Database
-            return await Task.Run(() => ProcessPoint(StartIndex-1));
-
-        }
-
-        private async Task<bool> onHasNewAlarm()
-        {
-            //Refresh Point from Database
-            _DigitalPointInfoList = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
-
-            if (_DigitalPointInfoList == null)
-                return false;                         //Can't Access Database
-
-            return await Task.Run(() => ProcessPoint(_mAlarmList.nStartIndex));
-           
-        }
-
-        private bool ProcessPoint(int StatartIndex)
-        {
-            this._nNewRestPoint = 0;
-
-            this.RestAlarmList.Clear();
-
-            if (_flgMatchingInProgress == true)
-                return false;
-
-            _flgMatchingInProgress = true;
-
-            for (int iIndex = StatartIndex + 1; iIndex < _mAlarmList.ListAlarm.Count; iIndex++)
-            {
-                AlarmList al = _mAlarmList.ListAlarm[iIndex];
-                if (al.pointType != PointType.Digital) continue;
-
-                var groupByStations = _DigitalPointInfoList.Where(c => c.StationName.Trim() == al.StationName.Trim());// Groupong Station before Mapping
-
-                RestorationAlarmList point = _mAlarmList.GetRestorationAlarmPoint(al, groupByStations); //Mapping CSV Point --> DigitalPointInfo Table
-
-                if (point != null)
-                {
-                    try
-                    {
-                        this.RestAlarmList.Add(point);
-                        _nNewRestPoint++;
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.ToString());
-
-                    }
-
-                }
-            }
-
-            _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count - 1;// Index start with 0
-            _mRestorationAlarmList.RestAlarmContext.RestorationAlarmList.AddRange(this.RestAlarmList);
-            _mRestorationAlarmList.Complete();
-
-            _flgMatchingInProgress = false;
-
-            Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching Point");
-
-            Console.WriteLine($"Has {_nNewRestPoint} Restoration Alarm(s)");
-            //updateLogConsole((int)EventLogPosition.REST_NEW_POINT, $"Has {_nNewRestPoint} Restoration Alarm(s)");
-
-            return true;
-        }
-
-        private void updateLogConsole(int Position, string Msg)
-        {
-            ListEventLog.Insert(Position, Msg);
-            ListEventLog.RemoveAt(Position);
-        }
+      
         private void OnDBChanged(object source, RestEventArgs args)
         {
             switch (args.message)
@@ -327,13 +108,12 @@ namespace SmartAlarmAgent
         }
         private async void dispatcherTimerCSV_Tick(object sender, EventArgs e)
         {
-            if (_flgMatchingInProgress == true)
+            if (DataProcessor.flgStart == true)
             {
                 Console.WriteLine("Under Matching Point Process");
-                return ;
+                return;
             }
-            await Task.Run(() => _mAlarmList.GetNewAlarmListAsync());
-
+            await Task.Run(() => DataProcessor.GetCSVData());
         }
 
         private void dispatcherTimerDB_Tick(object sender, EventArgs e)
