@@ -10,7 +10,7 @@
 
     <UserControl.Resources>
         <DataTemplate x:Key="EventDataTemplate" DataType="model:Event">
-            <Border Margin="1" BorderBrush="Black" BorderThickness="0.5" CornerRadius="3" Padding="2">
+            <Border Margin="0" BorderBrush="Turquoise" BorderThickness="0.25" CornerRadius="2" Padding="2">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition/>
@@ -22,10 +22,10 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="Time : " Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Right"/>
+                    <TextBlock Text="Time : " Grid.Row="0" FontWeight="Bold" HorizontalAlignment="Left"/>
                     <TextBlock Grid.Column="1" Grid.Row="0" Text="{Binding TimeStamp}"/>
-                    <TextBlock Grid.Column="2" Text="--- " Grid.Row="0" />
-                    <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding Message}" FontWeight="Bold" />
+                    <TextBlock Grid.Column="2" Text="--> " Grid.Row="0" />
+                    <TextBlock Grid.Column="3" Grid.Row="0" Text="{Binding Message}" Foreground="Khaki" />
                 </Grid>
             </Border>
         </DataTemplate>

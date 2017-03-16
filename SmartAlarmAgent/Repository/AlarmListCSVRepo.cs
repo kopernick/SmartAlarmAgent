@@ -27,6 +27,13 @@ namespace SmartAlarmAgent.Repository
         {
             get { return _CSVLastModify; }
         }
+
+        private string _CSVFile;
+        public string CSVFile
+        {
+            get { return _CSVFile; }
+        }
+        
         public DateTime dLastLoadDB { get; set; }
         public DateTime dLastReadCSV { get; set; }
         public DateTime dLastInsertRestAlarm { get; set; }
@@ -57,6 +64,7 @@ namespace SmartAlarmAgent.Repository
         public List<AlarmList> ListAlarm
         {
             get { return _listAlarm; }
+            set { _listAlarm = value; }
         }
 
         #endregion Properties
@@ -78,6 +86,7 @@ namespace SmartAlarmAgent.Repository
             this._nLastAlarmRecIndex = -1;
             this._nLastRestAlarmID = 0;
             this._nStartIndex = -1;
+            _CSVFile = null;
 
             this._listAlarm = new List<AlarmList>();
 
@@ -100,12 +109,12 @@ namespace SmartAlarmAgent.Repository
 
             try
             {
-                string csvFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
+                _CSVFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
                 // string csvFile = @"c:\ExportDB\AlarmList.csv";
 
 
 #if true
-                FileInfo file = new FileInfo(csvFile);
+                FileInfo file = new FileInfo(_CSVFile);
                 var DateModification = file.LastWriteTime;
 
                 if (_CSVLastModify == DateModification)
@@ -131,9 +140,9 @@ namespace SmartAlarmAgent.Repository
                         onRestAlarmCSVChanged(args); //Raise the Event
                         return null;
                     }
-                } while (IsFileLocked(csvFile));
+                } while (IsFileLocked(_CSVFile));
 
-                this._listAlarm = File.ReadLines(csvFile)
+                this._listAlarm = File.ReadLines(_CSVFile)
                             .Skip(1)
                             .Select(line => AlarmList.GetLineAlarmListCsv(line))
                             .ToList();
@@ -218,13 +227,15 @@ namespace SmartAlarmAgent.Repository
                     {
                         args.message = "Has No New Alarm";
                         args.TimeStamp = DateTime.Now;
-                        onRestAlarmCSVChanged(args); 
+                        onRestAlarmCSVChanged(args);
+
+                        this._listAlarm.Clear(); //Clear Data after using
 
                         break;//Same Position in CSV Has no New Alarm
                     }
 
                     this._nStartIndex = iStartIndex;
-                    this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
+                    //this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
 
                     args.message = "Has New Alarm";
                     args.TimeStamp = DateTime.Now;
@@ -234,8 +245,8 @@ namespace SmartAlarmAgent.Repository
             }
             else
             {
-                if(!(this._listAlarm == null || this._listAlarm.Count == 0))
-                    this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
+                //if(!(this._listAlarm == null || this._listAlarm.Count == 0))
+                    //this._nLastAlarmRecIndex = (int)this._listAlarm[this._listAlarm.Count-1].RecIndex; //Update LastAlarm Index
 
                 args.message = "Start Process";
                 args.TimeStamp = DateTime.Now;

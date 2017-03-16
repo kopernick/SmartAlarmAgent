@@ -74,19 +74,38 @@ namespace SmartAlarmAgent.Model
 
         public void UpdateActivityConsole()
         {
-            try
-            {
-                lock (_lock)
-                {
-                  
-                  ListEventLog.Add(new Event() { Message = eventArg.message, TimeStamp = eventArg.TimeStamp });
-               
-                }
+            switch(eventArg.Target)
+            { 
+            case "Activity":
+                  try
+                  {
+                      lock (_lock)
+                      {
+                        
+                        ListEventLog.Insert(0, new Event() { Message = eventArg.Message, TimeStamp = eventArg.TimeStamp });
+                     
+                      }
+                  }
+                  catch(Exception e)
+                  {
+                      Console.WriteLine("What is It" + e.Message);
+                  }
+                break;
+
+            case "CSVStatus":
+                    Console.WriteLine("CSV Last Modified : " + eventArg.ConnStatus.LastModified
+                        +" File : "+ eventArg.ConnStatus.Info 
+                        +" Status : "+ (eventArg.ConnStatus.Status?"Connected": "Disconnected"));
+                    break;
+
+            case "DBStatus":
+                    Console.WriteLine("DB Last Modified : " + eventArg.ConnStatus.LastModified
+                        + " File : " + eventArg.ConnStatus.Info
+                        + " Status : " + (eventArg.ConnStatus.Status ? "Connected" : "Disconnected"));
+
+                    break;
             }
-            catch(Exception e)
-            {
-                Console.WriteLine("What is It" + e.Message);
-            }
+
         }
 
         //public void OnEventChanged(object source, EventChangedEventArgs e)
@@ -102,7 +121,15 @@ namespace SmartAlarmAgent.Model
         {
             public DateTime TimeStamp { get; set; }
             public int UpdatePost { get; set; }
-            public string message { get; set; }
+            public string Message { get; set; }
+            public string Target { get; set; }
+           public ConnectionStatus ConnStatus { get; set; }
+    }
+    public class ConnectionStatus
+    {
+        public DateTime LastModified { get; set; }
+        public bool Status  { get; set; }
+        public string Info { get; set; }
     }
 
     #endregion Helper

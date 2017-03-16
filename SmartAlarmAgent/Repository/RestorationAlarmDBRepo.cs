@@ -32,7 +32,7 @@ namespace SmartAlarmAgent.Repository
         #endregion Properties
 
         #region Event & Delegate
-        public event EventHandler<RestEventArgs> RestAlarmDBChanged;
+        public static  event EventHandler<RestEventArgs> RestAlarmDBChanged;
         private void onRestAlarmDBChanged(RestEventArgs arg)
         {
             if (RestAlarmDBChanged != null)
@@ -78,7 +78,7 @@ namespace SmartAlarmAgent.Repository
             
         }
 
-        public async Task<List<RestorationAlarmList>> GetRestorationAlarmListAsync()
+        public async Task<List<RestorationAlarmList>> GetRestorationAlarmListTimeAscAsync()
         {
             RestEventArgs args = new RestEventArgs();
 
@@ -88,7 +88,7 @@ namespace SmartAlarmAgent.Repository
                 args.TimeStamp = DateTime.Now;
 
                 return await _RestAlarmContext.RestorationAlarmList
-                    .OrderByDescending(c=>c.DateTime)
+                    .OrderBy(c => c.DateTime)
                     .ToListAsync();
 
                 //var LastRestAlarmPoint = _RestAlarmContext.RestorationAlarmList.LastOrDefault();
@@ -107,8 +107,24 @@ namespace SmartAlarmAgent.Repository
                 onRestAlarmDBChanged(args); //Raise the Event
 
             }
-
         }
+
+        public bool GetDBStatus()
+        {
+            RestEventArgs args = new RestEventArgs();
+
+            var iState = RestAlarmContext.Database.Exists();
+            if (iState)
+                args.message = "Connected";
+            else
+                args.message = "Disconnected";
+                
+            args.TimeStamp = DateTime.Now;
+            onRestAlarmDBChanged(args); //Raise the Event
+
+            return iState;
+        }
+    
 
         public void Complete()
         {

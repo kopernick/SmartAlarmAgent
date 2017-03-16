@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SmartAlarmAgent"
         xmlns:Activity="clr-namespace:SmartAlarmAgent.Views"
         mc:Ignorable="d"
-        Title="SmartAlarm Agent" Height="480" Width="640" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="SmartAlarm Agent" Height="520" Width="480" MinHeight="480"  MinWidth="480" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.Resources>
