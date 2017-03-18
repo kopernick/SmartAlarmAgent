@@ -89,7 +89,7 @@ namespace SmartAlarmAgent.Repository
 
                 return await _RestAlarmContext.RestorationAlarmList
                     .OrderBy(c => c.DateTime)
-                    .ToListAsync();
+                    .ToListAsync< RestorationAlarmList>();
 
                 //var LastRestAlarmPoint = _RestAlarmContext.RestorationAlarmList.LastOrDefault();
                 //return LastRestAlarmPoint;
@@ -109,6 +109,7 @@ namespace SmartAlarmAgent.Repository
             }
         }
 
+      
         public bool GetDBStatus()
         {
             RestEventArgs args = new RestEventArgs();

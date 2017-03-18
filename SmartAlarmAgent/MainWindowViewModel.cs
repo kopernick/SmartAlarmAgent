@@ -48,6 +48,7 @@ namespace SmartAlarmAgent
         {
             get { return _nNewRestPoint; }
         }
+
         #endregion Properties
 
         #region Constructor
@@ -88,6 +89,7 @@ namespace SmartAlarmAgent
                 return;
             }
             await Task.Run(() => DataProcessor.GetCSVData());
+
         }
 
         private async void dispatcherTimerDB_Tick(object sender, EventArgs e)

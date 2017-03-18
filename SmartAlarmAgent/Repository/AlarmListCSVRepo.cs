@@ -229,7 +229,7 @@ namespace SmartAlarmAgent.Repository
                         args.TimeStamp = DateTime.Now;
                         onRestAlarmCSVChanged(args);
 
-                        this._listAlarm.Clear(); //Clear Data after using
+                        //this._listAlarm.Clear(); //Clear Data after using
 
                         break;//Same Position in CSV Has no New Alarm
                     }

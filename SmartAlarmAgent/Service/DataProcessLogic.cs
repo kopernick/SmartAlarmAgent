@@ -73,6 +73,8 @@ namespace SmartAlarmAgent.Service
         public DateTime dLastLoadDB { get; set; }
         public DateTime dLastReadCSV { get; set; }
         public DateTime dLastInsertRestAlarm { get; set; }
+        //public RestorationAlarmList LastRestAlarmPoint { get; private set; }
+        //public AlarmList LastCsvItem { get; private set; }
 
         #endregion Properties
 
@@ -145,7 +147,7 @@ namespace SmartAlarmAgent.Service
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Fail");
                     //updateLogConsole((int)EventLogPosition.CSV_STATUS , "Read CSV Fail");
                     UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "CSVStatus", true);//Update CSV File Status
+                    UpdateActivityStatus(args, "CSVStatus", false);//Update CSV File Status
 
                     break;
 
@@ -163,7 +165,7 @@ namespace SmartAlarmAgent.Service
                     break;
 
                 case "Start Process":
-                    Console.WriteLine(args.TimeStamp.ToString() + " : Start Data Proceesing");
+                    Console.WriteLine(args.TimeStamp.ToString() + " : Start Data Processing");
 
                     UpdateActivityMonitor(args, "Activity");
                     await this.onStartProcess(args);
@@ -182,8 +184,16 @@ namespace SmartAlarmAgent.Service
 
             this.RestAlarmList.Clear();
 
+            //if (!isDBConnected())
+            //{
+            //    Console.WriteLine("DBConnection Error");
+            //    _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
+            //    return false;
+            //}
+
+
             var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync();
-            if(RestAlarmPointList== null)
+            if(RestAlarmPointList == null)
             {
                 Console.WriteLine("DBConnection Error");
                 _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
@@ -250,6 +260,11 @@ namespace SmartAlarmAgent.Service
                 return false;
             }
 
+            //Refresh Point from Database
+            _DigitalPointInfoList = await _mRestorationAlarmList.GetAllDigitalPointInfoAsync();
+
+            if (_DigitalPointInfoList == null)
+                return false;                         //Can't Access Database
 
             return await Task.Run(() => ProcessPoint(_mAlarmList.nStartIndex, args));
 
@@ -313,7 +328,7 @@ namespace SmartAlarmAgent.Service
 
                 
 
-                _mAlarmList.ListAlarm.Clear(); //Clear Data after using
+                //_mAlarmList.ListAlarm.Clear(); //Clear Data after using
             }
             catch
             {
@@ -349,12 +364,12 @@ namespace SmartAlarmAgent.Service
                     break;
 
                 case "Connected":
-                    UpdateActivityMonitor(args, "Activity");
+                    //UpdateActivityMonitor(args, "Activity");
                     UpdateActivityStatus(args, "DBStatus", true);//Update CSV File Status
                     break;
                 case "Disconnected":
-                    UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "DBStatus", false);//Update CSV File Status
+                    //UpdateActivityMonitor(args, "Activity");
+                    UpdateActivityStatus(args, "DBStatus", false);//Update Database File Status
                     break;
 
                 default:
@@ -374,30 +389,44 @@ namespace SmartAlarmAgent.Service
             onUpdateActivityMonitor(LogArg);
         }
 
-        private void UpdateActivityStatus(RestEventArgs args, string _target, bool state)
+        private async void UpdateActivityStatus(RestEventArgs args, string _target, bool state)
         {
             EventChangedEventArgs LogArg = new EventChangedEventArgs();
             LogArg.TimeStamp = args.TimeStamp;
             LogArg.Message = args.message;
             LogArg.Target = _target;
+
+            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync();
+            RestorationAlarmList LastRestAlarmPoint = null;
+
+            if (RestAlarmPointList != null)
+                LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+            
+            var LastCsvItem = _mAlarmList.ListAlarm.LastOrDefault(); //Get First CSV Item
+
             if (_target == "CSVStatus")
-            { 
+            {
                 LogArg.ConnStatus = new ConnectionStatus()
                 {
                     LastModified = _mAlarmList.CSVLastModify,
                     Status = state,
-                    Info = _mAlarmList.CSVFile
+                    Info = _mAlarmList.CSVFile,
+                    LastRec = LastCsvItem != null ? (LastCsvItem.Time.ToString() + " : " + LastCsvItem.PointName) : "Non"
+
+                    //LastCsvItem = null;
                 };
             }
-            else if(_target == "DBStatus")
+            else if (_target == "DBStatus")
             {
                 //var db = new RestorationAlarmDbContext();
-                
+
                 LogArg.ConnStatus = new ConnectionStatus()
                 {
                     LastModified = args.TimeStamp,
                     Status = state,
-                    Info = _mRestorationAlarmList.RestAlarmContext.Database.Connection.ConnectionString.ToString()
+                    Info = _mRestorationAlarmList.RestAlarmContext.Database.Connection.DataSource.ToString(),
+
+                    LastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non"
                 };
             }
             onUpdateActivityMonitor(LogArg);
