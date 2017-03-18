@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartAlarmData", "SmartAlar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SmartAlarmCFData", "SmartAlarmCFData\SmartAlarmCFData.csproj", "{F5498A81-75CD-4C8E-9FE0-119818E9335B}"
 EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "AgentSetup", "AgentSetup\AgentSetup.vdproj", "{A6E76265-9FD7-4B80-A30A-4E2C1FB23A10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,8 @@ Global
 		{F5498A81-75CD-4C8E-9FE0-119818E9335B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F5498A81-75CD-4C8E-9FE0-119818E9335B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F5498A81-75CD-4C8E-9FE0-119818E9335B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6E76265-9FD7-4B80-A30A-4E2C1FB23A10}.Debug|Any CPU.ActiveCfg = Debug
+		{A6E76265-9FD7-4B80-A30A-4E2C1FB23A10}.Release|Any CPU.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

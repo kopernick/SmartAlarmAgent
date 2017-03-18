@@ -5,6 +5,7 @@ using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Threading;
 
 namespace SmartAlarmAgent.Model
 {
@@ -12,6 +13,9 @@ namespace SmartAlarmAgent.Model
     {
 
         #region Properties
+
+        private DispatcherTimer m_dispatcherTimerClearActivity = new System.Windows.Threading.DispatcherTimer();
+
         private ObservableCollection<Event> _ListEventLog;
         public ObservableCollection<Event> ListEventLog
         {
@@ -26,6 +30,8 @@ namespace SmartAlarmAgent.Model
 
             }
         }
+
+        public string Time { get; private set; }
 
         private string _CSVFile;
         public string CSVFile
@@ -183,6 +189,10 @@ namespace SmartAlarmAgent.Model
             ListEventLog = new ObservableCollection<Event>();
             DataProcessLogic.SendUpdateEvent += OnAlarmListChanged;
             BindingOperations.EnableCollectionSynchronization(ListEventLog, _lock);
+
+            this.m_dispatcherTimerClearActivity.Interval = new TimeSpan(0, 0, 1); //Get Update Database Period
+            this.m_dispatcherTimerClearActivity.Start();
+            this.m_dispatcherTimerClearActivity.Tick += dispatcherTimerClearAct_Tick;
         }
 
         private void OnAlarmListChanged(object sender, EventChangedEventArgs e)
@@ -219,29 +229,29 @@ namespace SmartAlarmAgent.Model
 
         public void UpdateActivityConsole()
         {
-            switch(eventArg.Target)
-            { 
-            case "Activity":
-                  try
-                  {
-                      lock (_lock)
-                      {
-                        
-                        ListEventLog.Insert(0, new Event() { Message = eventArg.Message, TimeStamp = eventArg.TimeStamp });
-                     
-                      }
-                  }
-                  catch(Exception e)
-                  {
-                      Console.WriteLine("What is It" + e.Message);
-                  }
-                break;
+            switch (eventArg.Target)
+            {
+                case "Activity":
+                    try
+                    {
+                        lock (_lock)
+                        {
 
-            case "CSVStatus":
+                            ListEventLog.Insert(0, new Event() { Message = eventArg.Message, TimeStamp = eventArg.TimeStamp });
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("What is It" + e.Message);
+                    }
+                    break;
+
+                case "CSVStatus":
                     Console.WriteLine("CSV Last Modified : " + eventArg.ConnStatus.LastModified
-                        +" File : "+ eventArg.ConnStatus.Info 
-                        +" Status : "+ (eventArg.ConnStatus.Status?"Connected": "Disconnected"));
-                    
+                        + " File : " + eventArg.ConnStatus.Info
+                        + " Status : " + (eventArg.ConnStatus.Status ? "Connected" : "Disconnected"));
+
                     CSVFile = eventArg.ConnStatus.Info;
                     CSVLastModify = eventArg.ConnStatus.LastModified;
                     CSVStatus = eventArg.ConnStatus.Status ? "Connected" : "Disconnected";
@@ -256,7 +266,7 @@ namespace SmartAlarmAgent.Model
 
                     DBName = eventArg.ConnStatus.Info;
                     //DBLastAccess = eventArg.ConnStatus.LastModified;
-                    if(eventArg.ConnStatus.Status)
+                    if (eventArg.ConnStatus.Status)
                         DBLastAccess = eventArg.ConnStatus.LastModified;
 
                     DBStatus = eventArg.ConnStatus.Status ? "Connected" : "Connection Fail";
@@ -265,7 +275,13 @@ namespace SmartAlarmAgent.Model
 
                     break;
             }
+        }
 
+        private void dispatcherTimerClearAct_Tick(object sender, EventArgs e)
+        {
+            Time = DateTime.Now.ToLongTimeString();
+            if (Time.Equals("12:00:00 AM"))
+                ListEventLog.Clear();
         }
 
         //public void OnEventChanged(object source, EventChangedEventArgs e)
@@ -275,7 +291,7 @@ namespace SmartAlarmAgent.Model
         //        Console.WriteLine(e.TimeStamp.ToString() + "\t" + e.Msg.ToString());
         //        //mLogConsole.Text += e.TimeStamp.ToString() + "\t" + e.Status.ToString();
         //    }
-        }
+  }
 
     public class EventChangedEventArgs : EventArgs
         {

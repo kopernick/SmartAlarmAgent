@@ -18,7 +18,7 @@ namespace SmartAlarmAgent
         #region Properties
 
         private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
-        private DispatcherTimer m_dispatcherTimerDB = new System.Windows.Threading.DispatcherTimer();
+        private DispatcherTimer m_dispatcherTimerClock = new System.Windows.Threading.DispatcherTimer();
 
         private DataProcessLogic DataProcessor = new DataProcessLogic();
 
@@ -49,6 +49,17 @@ namespace SmartAlarmAgent
             get { return _nNewRestPoint; }
         }
 
+        public string _Time;
+        public string Time
+        {
+            get { return _Time; }
+            set
+            {
+                _Time = value;
+                OnPropertyChanged("Time");
+            }
+        }
+
         #endregion Properties
 
         #region Constructor
@@ -75,9 +86,9 @@ namespace SmartAlarmAgent
             this.m_dispatcherTimerCSV.Start();
             this.m_dispatcherTimerCSV.Tick += dispatcherTimerCSV_Tick;
 
-            this.m_dispatcherTimerDB.Interval = new TimeSpan(0, 15, 0); //Get Update Database Period
-            this.m_dispatcherTimerDB.Start();
-            this.m_dispatcherTimerDB.Tick += dispatcherTimerDB_Tick;
+            this.m_dispatcherTimerClock.Interval = new TimeSpan(0, 0, 1); //Get Update Database Period
+            this.m_dispatcherTimerClock.Start();
+            this.m_dispatcherTimerClock.Tick += dispatcherTimerClock_Tick;
             this.nLastAlarmRecIndex = DataProcessor.nLastAlarmRecIndex;
 
         }
@@ -92,11 +103,10 @@ namespace SmartAlarmAgent
 
         }
 
-        private async void dispatcherTimerDB_Tick(object sender, EventArgs e)
+        private void dispatcherTimerClock_Tick(object sender, EventArgs e)
         {
-            Console.WriteLine(DateTime.Now.ToString() + " : Timer Get Update DB");
-
-            await Task.Run(() => DataProcessor.isDBConnected());
+            Time = DateTime.Now.ToLongTimeString();
+                
         }
 
         #endregion Methode

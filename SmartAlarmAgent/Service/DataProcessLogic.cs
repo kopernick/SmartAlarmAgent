@@ -320,7 +320,7 @@ namespace SmartAlarmAgent.Service
                 {
                     LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
                 }
-                args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" New Alarm(s), Has { _nNewRestPoint} Restoration Alarm(s)";
+                args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" Alarm(s),:=> { _nNewRestPoint} Restoration Alarm(s)";
 
                 UpdateActivityMonitor(args, "Activity");
 

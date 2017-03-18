@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SmartAlarmAgent"
         xmlns:Activity="clr-namespace:SmartAlarmAgent.Views"
         mc:Ignorable="d"
-        Title="SmartAlarm Agent" Height="380" Width="480" MinHeight="200"  MinWidth="500" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
+        Title="SmartAlarm Agent" Height="380" Width="480" MinHeight="200"  MinWidth="580" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.Resources>
@@ -29,6 +29,7 @@
         </Grid.RowDefinitions>
 
         <!--ToolBar-->
+        
 
         <Grid DockPanel.Dock ="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
             <Activity:ActivityMonitorView x:Name="ActivityView" />
@@ -37,8 +38,14 @@
                                           VerticalAlignment="Stretch" Height="Auto"-->
 
         </Grid>
+        
+        <Label DockPanel.Dock ="Bottom" x:Name="lblTime" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+               Content="{Binding Time}" Width="Auto" Height="29" Margin="2" 
+               VerticalAlignment="Top" VerticalContentAlignment="Center" 
+               FontSize="12" Foreground="#FF84AD17" 
+               HorizontalContentAlignment="Right"/>
 
-        <!-- Status Bar -->
+        <!--
         <StatusBarItem Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
             <StackPanel Orientation="Horizontal">
                 <Label Content="Current RecIndex:"/>
@@ -46,6 +53,6 @@
                        Content ="{Binding nLastAlarmRecIndex}"/>
             </StackPanel>
         </StatusBarItem>
-
+-->
     </Grid>
 </Window>
