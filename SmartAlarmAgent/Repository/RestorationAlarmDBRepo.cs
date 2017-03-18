@@ -51,12 +51,11 @@ namespace SmartAlarmAgent.Repository
         #region Methode
         public async Task<List<DigitalPointInfo>> GetAllDigitalPointInfoAsync()
         {
-            RestEventArgs args = new RestEventArgs();
 
             try
             {
-                args.message = "Read DB Success";
-                args.TimeStamp = DateTime.Now;
+
+                Console.WriteLine(DateTime.Now.ToString() + " : GetAllDigitalPointInfo Read DB Success");
 
                 return await _RestAlarmContext.DigitalPointInfo
                     .Where(c => !(string.IsNullOrEmpty(c.MACName)))
@@ -64,17 +63,12 @@ namespace SmartAlarmAgent.Repository
             }
             catch
             {
-                args.message = "Read DB Fail";
-                args.TimeStamp = DateTime.Now;
+
+                Console.WriteLine(DateTime.Now.ToString() + " : GetAllDigitalPointInfo Read DB Fail");
                 return null;
                 
             }
-            finally
-            {
-                //Send Event after Get All DigitalInfo
-                onRestAlarmDBChanged(args); //Raise the Event
 
-            }
             
         }
 
@@ -114,8 +108,8 @@ namespace SmartAlarmAgent.Repository
         {
             RestEventArgs args = new RestEventArgs();
 
-            var iState = RestAlarmContext.Database.Exists();
-            if (iState)
+            var isExist = RestAlarmContext.Database.Exists();
+            if (isExist)
                 args.message = "Connected";
             else
                 args.message = "Disconnected";
@@ -123,7 +117,7 @@ namespace SmartAlarmAgent.Repository
             args.TimeStamp = DateTime.Now;
             onRestAlarmDBChanged(args); //Raise the Event
 
-            return iState;
+            return isExist;
         }
     
 

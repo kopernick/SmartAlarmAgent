@@ -73,6 +73,8 @@ namespace SmartAlarmAgent.Service
         public DateTime dLastLoadDB { get; set; }
         public DateTime dLastReadCSV { get; set; }
         public DateTime dLastInsertRestAlarm { get; set; }
+        public RestorationAlarmList LastRestAlarmPoint { get; private set; }
+
         //public RestorationAlarmList LastRestAlarmPoint { get; private set; }
         //public AlarmList LastCsvItem { get; private set; }
 
@@ -100,6 +102,8 @@ namespace SmartAlarmAgent.Service
             AlarmListCSVRepo.RestAlarmCSVChanged += OnAlarmListChanged;
 
             RestorationAlarmDBRepo.RestAlarmDBChanged += OnDBChanged;
+
+            LastRestAlarmPoint = null;
 
             // _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
 
@@ -184,23 +188,19 @@ namespace SmartAlarmAgent.Service
 
             this.RestAlarmList.Clear();
 
-            //if (!isDBConnected())
-            //{
-            //    Console.WriteLine("DBConnection Error");
-            //    _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
-            //    return false;
-            //}
-
-
-            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync();
-            if(RestAlarmPointList == null)
+            if (!isDBConnected())
             {
                 Console.WriteLine("DBConnection Error");
                 _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
                 return false;
             }
 
-            var LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+
+            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync(); //Read RestorationAlarmList Table from DB
+            if (RestAlarmPointList != null)
+            {
+                LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+            }
 
             var LastCsvItem = _mAlarmList.ListAlarm.FirstOrDefault(); //Get First CSV Item
             this.nLastAlarmRecIndex = _mAlarmList.nLastAlarmRecIndex;  //Update LastAlarmRecIndex Display
@@ -214,7 +214,7 @@ namespace SmartAlarmAgent.Service
                 if (_DigitalPointInfoList == null)
                     return false;                         //Can't Access Database
 
-                return await Task.Run(() => ProcessPoint(_mAlarmList.nStartIndex, args));
+                return await ProcessPoint(_mAlarmList.nStartIndex, args);
             }
 
 
@@ -246,7 +246,7 @@ namespace SmartAlarmAgent.Service
 
             if (_DigitalPointInfoList == null)
                 return false;                         //Can't Access Database
-            return await Task.Run(() => ProcessPoint(StartIndex, args));
+            return await ProcessPoint(StartIndex, args);
 
         }
 
@@ -266,11 +266,11 @@ namespace SmartAlarmAgent.Service
             if (_DigitalPointInfoList == null)
                 return false;                         //Can't Access Database
 
-            return await Task.Run(() => ProcessPoint(_mAlarmList.nStartIndex, args));
+            return await ProcessPoint(_mAlarmList.nStartIndex, args);
 
         }
 
-        private bool ProcessPoint(int StatartIndex, RestEventArgs args)
+        private async Task<bool> ProcessPoint(int StatartIndex, RestEventArgs args)
         {
             this._nNewRestPoint = 0;
 
@@ -308,13 +308,18 @@ namespace SmartAlarmAgent.Service
 
             //_mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count - 1; // Index start with 0
             //this.nLastAlarmRecIndex = _mAlarmList.nLastAlarmRecIndex;  //Update LastAlarmRecIndex Display
-            
+
 
             try
             {
                 _mRestorationAlarmList.RestAlarmContext.RestorationAlarmList.AddRange(this.RestAlarmList);
                 _mRestorationAlarmList.Complete();
 
+                var RestAlarmPointList = await Task.Run(() => _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync()); //Read RestorationAlarmList Table from DB
+                if (RestAlarmPointList != null)
+                {
+                    LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+                }
                 args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" New Alarm(s), Has { _nNewRestPoint} Restoration Alarm(s)";
 
                 UpdateActivityMonitor(args, "Activity");
@@ -326,20 +331,21 @@ namespace SmartAlarmAgent.Service
 
                 Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching--> Has {_nNewRestPoint} Restoration Alarm(s)");
 
-                
+
 
                 //_mAlarmList.ListAlarm.Clear(); //Clear Data after using
             }
             catch
             {
                 Console.WriteLine("Error on Save to DB");
+                return true;
             }
             finally
             {
                 _flgMatchingInProgress = false;
             }
 
-            
+
             //updateLogConsole((int)EventLogPosition.REST_NEW_POINT, $"Has {_nNewRestPoint} Restoration Alarm(s)");
 
             return true;
@@ -389,19 +395,13 @@ namespace SmartAlarmAgent.Service
             onUpdateActivityMonitor(LogArg);
         }
 
-        private async void UpdateActivityStatus(RestEventArgs args, string _target, bool state)
+        private void UpdateActivityStatus(RestEventArgs args, string _target, bool state)
         {
             EventChangedEventArgs LogArg = new EventChangedEventArgs();
             LogArg.TimeStamp = args.TimeStamp;
             LogArg.Message = args.message;
             LogArg.Target = _target;
 
-            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync();
-            RestorationAlarmList LastRestAlarmPoint = null;
-
-            if (RestAlarmPointList != null)
-                LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
-            
             var LastCsvItem = _mAlarmList.ListAlarm.LastOrDefault(); //Get First CSV Item
 
             if (_target == "CSVStatus")
