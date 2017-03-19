@@ -20,22 +20,7 @@ namespace SmartAlarmAgent
         private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
         private DispatcherTimer m_dispatcherTimerClock = new System.Windows.Threading.DispatcherTimer();
 
-        private DataProcessLogic DataProcessor = new DataProcessLogic();
-
-        private int _nLastAlarmRecIndex;
-        public int nLastAlarmRecIndex
-        { get
-            {
-                return _nLastAlarmRecIndex;
-            }
-            set
-            {
-                _nLastAlarmRecIndex = value;
-                //OnPropertyChanged("nLastAlarmRecIndex");
-            }
-        }
-
-       
+        public DataProcessLogic DataProcessor { get; private set; }
 
         private bool _flgMatchingInProgress;
         public bool flgStart
@@ -68,6 +53,7 @@ namespace SmartAlarmAgent
             
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
+            DataProcessor = new DataProcessLogic();
 
             Initializer();
             Console.WriteLine("Skip");
@@ -89,8 +75,6 @@ namespace SmartAlarmAgent
             this.m_dispatcherTimerClock.Interval = new TimeSpan(0, 0, 1); //Get Update Database Period
             this.m_dispatcherTimerClock.Start();
             this.m_dispatcherTimerClock.Tick += dispatcherTimerClock_Tick;
-            this.nLastAlarmRecIndex = DataProcessor.nLastAlarmRecIndex;
-
         }
         private async void dispatcherTimerCSV_Tick(object sender, EventArgs e)
         {

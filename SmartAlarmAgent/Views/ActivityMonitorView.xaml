@@ -45,7 +45,8 @@
         <!-- Column 1 -->
         <!-- Row 1 -->
         <!-- Row 2 -->
-        <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0">
+        
+        <!-- <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0">
             <Grid>
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width="Auto"/>
@@ -92,9 +93,9 @@
                                         Background="{Binding CSVBackgroundColor}" Margin="2">
                 </TextBlock>
             </Grid>
-        </Grid>
+        </Grid> -->
 
-        <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2">
+        <!-- <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2">
             <Grid >
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width="Auto"/>
@@ -106,12 +107,6 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-
-                <!-- Column 1 -->
-                <!-- Row 1 -->
-                <!-- Row 2 -->
-
-
 
                 <Label Grid.Column="0" Grid.Row="0"  Grid.RowSpan="1" VerticalAlignment="Center" 
                                FontSize="11" Foreground="Red">
@@ -146,11 +141,12 @@
                                         Background="{Binding DBBackgroundColor}" Margin="2">
                 </TextBlock>
 
-                <!-- Row2 -->
             </Grid>
         </Grid>
-
-        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
+        
+    -->
+    
+    <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" >
             <StackPanel>
                 <ListView ItemsSource ="{Binding ListEventLog}"
                         x:Name="LogConsole"  

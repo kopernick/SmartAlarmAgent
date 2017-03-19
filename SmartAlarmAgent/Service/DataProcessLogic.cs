@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media;
 
 namespace SmartAlarmAgent.Service
 {
@@ -27,7 +28,7 @@ namespace SmartAlarmAgent.Service
             set
             {
                 _nLastAlarmRecIndex = value;
-                OnPropertyChanged("nLastAlarmRecIndex");
+                OnPropertyChanged(nameof(nLastAlarmRecIndex));
             }
         }
         private int _nNewRestPoint;
@@ -49,10 +50,146 @@ namespace SmartAlarmAgent.Service
             get { return _listAlarm; }
         }
 
+        private string _CSVFile;
+        public string CSVFile
+        {
+            get
+            {
+                return _CSVFile;
+
+            }
+            set
+            {
+                _CSVFile = value;
+                OnPropertyChanged(nameof(CSVFile));
+            }
+        }
+
+        private string _CSVStatus;
+        public string CSVStatus
+        {
+            get
+            {
+                return _CSVStatus;
+
+            }
+            set
+            {
+                _CSVStatus = value;
+                OnPropertyChanged(nameof(CSVStatus));
+            }
+        }
+
         private DateTime _CSVLastModify;
         public DateTime CSVLastModify
         {
-            get { return _CSVLastModify; }
+            get
+            {
+                return _CSVLastModify;
+
+            }
+            set
+            {
+                _CSVLastModify = value;
+                OnPropertyChanged(nameof(CSVLastModify));
+            }
+        }
+
+        private string _DBName;
+        public string DBName
+        {
+            get
+            {
+                return _DBName;
+
+            }
+            set
+            {
+                _DBName = value;
+                OnPropertyChanged(nameof(DBName));
+            }
+        }
+
+        private DateTime _DBLastAccess;
+        public DateTime DBLastAccess
+        {
+            get
+            {
+                return _DBLastAccess;
+
+            }
+            set
+            {
+                _DBLastAccess = value;
+                OnPropertyChanged(nameof(DBLastAccess));
+            }
+        }
+
+        private string _CSVLastAlarm;
+        public string CSVLastAlarm
+        {
+            get
+            {
+                return _CSVLastAlarm;
+
+            }
+            set
+            {
+                _CSVLastAlarm = value;
+                OnPropertyChanged(nameof(CSVLastAlarm));
+            }
+        }
+
+        private string _DBSLastRec;
+        public string DBSLastRec
+        {
+            get
+            {
+                return _DBSLastRec;
+
+            }
+            set
+            {
+                _DBSLastRec = value;
+                OnPropertyChanged(nameof(DBSLastRec));
+            }
+        }
+
+        private string _DBStatus;
+        public string DBStatus
+        {
+            get
+            {
+                return _DBStatus;
+
+            }
+            set
+            {
+                _DBStatus = value;
+                OnPropertyChanged(nameof(DBStatus));
+            }
+        }
+
+        private Brush _CSVBackgroundColor;
+        public Brush CSVBackgroundColor
+        {
+            get { return _CSVBackgroundColor; }
+            set
+            {
+                _CSVBackgroundColor = value;
+                OnPropertyChanged(nameof(CSVBackgroundColor));
+            }
+        }
+
+        private Brush _DBBackgroundColor;
+        public Brush DBBackgroundColor
+        {
+            get { return _DBBackgroundColor; }
+            set
+            {
+                _DBBackgroundColor = value;
+                OnPropertyChanged(nameof(DBBackgroundColor));
+            }
         }
 
         private readonly List<RestorationAlarmList> RestAlarmList = new List<RestorationAlarmList>();
@@ -141,7 +278,7 @@ namespace SmartAlarmAgent.Service
                 case "Read CSV Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Success");
                     //UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "CSVStatus", true);//Update CSV File Status
+                    UpdateConnectionStatus(args, "CSVStatus", true);//Update CSV File Status
 
                     onCheckCSVData();
 
@@ -151,7 +288,7 @@ namespace SmartAlarmAgent.Service
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Fail");
                     //updateLogConsole((int)EventLogPosition.CSV_STATUS , "Read CSV Fail");
                     UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "CSVStatus", false);//Update CSV File Status
+                    UpdateConnectionStatus(args, "CSVStatus", false);//Update CSV File Status
 
                     break;
 
@@ -371,11 +508,11 @@ namespace SmartAlarmAgent.Service
 
                 case "Connected":
                     //UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "DBStatus", true);//Update CSV File Status
+                    UpdateConnectionStatus(args, "DBStatus", true);//Update CSV File Status
                     break;
                 case "Disconnected":
                     //UpdateActivityMonitor(args, "Activity");
-                    UpdateActivityStatus(args, "DBStatus", false);//Update Database File Status
+                    UpdateConnectionStatus(args, "DBStatus", false);//Update Database File Status
                     break;
 
                 default:
@@ -395,41 +532,30 @@ namespace SmartAlarmAgent.Service
             onUpdateActivityMonitor(LogArg);
         }
 
-        private void UpdateActivityStatus(RestEventArgs args, string _target, bool state)
+        private void UpdateConnectionStatus(RestEventArgs args, string _target, bool state)
         {
-            EventChangedEventArgs LogArg = new EventChangedEventArgs();
-            LogArg.TimeStamp = args.TimeStamp;
-            LogArg.Message = args.message;
-            LogArg.Target = _target;
-
+            //EventChangedEventArgs LogArg = new EventChangedEventArgs();
+            
             var LastCsvItem = _mAlarmList.ListAlarm.LastOrDefault(); //Get First CSV Item
 
             if (_target == "CSVStatus")
             {
-                LogArg.ConnStatus = new ConnectionStatus()
-                {
-                    LastModified = _mAlarmList.CSVLastModify,
-                    Status = state,
-                    Info = _mAlarmList.CSVFile,
-                    LastRec = LastCsvItem != null ? (LastCsvItem.Time.ToString() + " : " + LastCsvItem.PointName) : "Non"
-
-                    //LastCsvItem = null;
-                };
+                CSVLastModify = _mAlarmList.CSVLastModify;
+                CSVStatus = state ? "Connection OK" : "Connection Fail";
+                CSVFile = _mAlarmList.CSVFile;
+                CSVLastAlarm = LastCsvItem != null ? (LastCsvItem.Time.ToString() + " : " + LastCsvItem.PointName) : "Non";
+                CSVBackgroundColor = state ? Brushes.Green : Brushes.Red;
             }
             else if (_target == "DBStatus")
             {
                 //var db = new RestorationAlarmDbContext();
+                DBLastAccess = args.TimeStamp;
+                DBStatus = state ? "Connected" : "Connection Fail";
+                DBName = _mRestorationAlarmList.RestAlarmContext.Database.Connection.DataSource.ToString();
 
-                LogArg.ConnStatus = new ConnectionStatus()
-                {
-                    LastModified = args.TimeStamp,
-                    Status = state,
-                    Info = _mRestorationAlarmList.RestAlarmContext.Database.Connection.DataSource.ToString(),
-
-                    LastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non"
-                };
+                DBSLastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non";
+                DBBackgroundColor = state ? Brushes.Green : Brushes.Red;
             }
-            onUpdateActivityMonitor(LogArg);
         }
 
     }
