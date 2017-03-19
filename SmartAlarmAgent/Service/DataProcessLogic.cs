@@ -277,10 +277,8 @@ namespace SmartAlarmAgent.Service
 
                 case "Read CSV Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read AlarmList.csv Success");
-                    //UpdateActivityMonitor(args, "Activity");
-                    UpdateConnectionStatus(args, "CSVStatus", true);//Update CSV File Status
-
                     onCheckCSVData();
+                    UpdateConnectionStatus(args, "CSVStatus", true);//Update CSV File Status
 
                     break;
 
@@ -295,7 +293,6 @@ namespace SmartAlarmAgent.Service
                 case "Has New Alarm":
                     Console.WriteLine(args.TimeStamp.ToString() + " : "
                         + (_mAlarmList.ListAlarm.Count - _mAlarmList.nStartIndex - 1).ToString() + " New Alarm(s)");
-
                     await this.onHasNewAlarm(args);
                     break;
 
@@ -307,9 +304,8 @@ namespace SmartAlarmAgent.Service
 
                 case "Start Process":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Start Data Processing");
-
-                    UpdateActivityMonitor(args, "Activity");
                     await this.onStartProcess(args);
+                    //UpdateActivityMonitor(args, "Activity");
                     break;
 
                 default:
@@ -459,8 +455,6 @@ namespace SmartAlarmAgent.Service
                 }
                 args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" Alarm(s),:=> { _nNewRestPoint} Restoration Alarm(s)";
 
-                UpdateActivityMonitor(args, "Activity");
-
                 _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count - 1; // Index start with 0
                 _mAlarmList.nLastAlarmRecIndex = (int)_mAlarmList.ListAlarm[_mAlarmList.ListAlarm.Count - 1].RecIndex; //Update LastAlarm Index
                 this.nLastAlarmRecIndex = _mAlarmList.nLastAlarmRecIndex;  //Update LastAlarmRecIndex Display
@@ -468,7 +462,8 @@ namespace SmartAlarmAgent.Service
 
                 Console.WriteLine($"{DateTime.Now.ToString()} : Finish Matching--> Has {_nNewRestPoint} Restoration Alarm(s)");
 
-
+                UpdateActivityMonitor(args, "Activity"); //Upadte Activity after Dataprocessing
+                UpdateConnectionStatus(args, "DBStatus", true);//Update Database Status
 
                 //_mAlarmList.ListAlarm.Clear(); //Clear Data after using
             }
@@ -550,7 +545,7 @@ namespace SmartAlarmAgent.Service
             {
                 //var db = new RestorationAlarmDbContext();
                 DBLastAccess = args.TimeStamp;
-                DBStatus = state ? "Connected" : "Connection Fail";
+                DBStatus = state ? "Database Connected" : "Can't Connect to Database";
                 DBName = _mRestorationAlarmList.RestAlarmContext.Database.Connection.DataSource.ToString();
 
                 DBSLastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non";
