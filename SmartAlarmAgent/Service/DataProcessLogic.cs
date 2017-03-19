@@ -329,10 +329,10 @@ namespace SmartAlarmAgent.Service
             }
 
 
-            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync(); //Read RestorationAlarmList Table from DB
+            var RestAlarmPointList = await _mRestorationAlarmList.GetRestorationAlarmListTimeDscAsync(); //Read RestorationAlarmList Table from DB
             if (RestAlarmPointList != null)
             {
-                LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+                LastRestAlarmPoint = RestAlarmPointList.FirstOrDefault(); //Get Last Record
             }
 
             var LastCsvItem = _mAlarmList.ListAlarm.FirstOrDefault(); //Get First CSV Item
@@ -448,10 +448,10 @@ namespace SmartAlarmAgent.Service
                 _mRestorationAlarmList.RestAlarmContext.RestorationAlarmList.AddRange(this.RestAlarmList);
                 _mRestorationAlarmList.Complete();
 
-                var RestAlarmPointList = await Task.Run(() => _mRestorationAlarmList.GetRestorationAlarmListTimeAscAsync()); //Read RestorationAlarmList Table from DB
+                var RestAlarmPointList = await Task.Run(() => _mRestorationAlarmList.GetRestorationAlarmListTimeDscAsync()); //Read RestorationAlarmList Table from DB
                 if (RestAlarmPointList != null)
                 {
-                    LastRestAlarmPoint = RestAlarmPointList.LastOrDefault(); //Get Last Record
+                    LastRestAlarmPoint = RestAlarmPointList.FirstOrDefault(); //Get Last Record
                 }
                 args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" Alarm(s),:=> { _nNewRestPoint} Restoration Alarm(s)";
 

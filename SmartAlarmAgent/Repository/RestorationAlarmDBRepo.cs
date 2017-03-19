@@ -72,7 +72,7 @@ namespace SmartAlarmAgent.Repository
             
         }
 
-        public async Task<List<RestorationAlarmList>> GetRestorationAlarmListTimeAscAsync()
+        public async Task<List<RestorationAlarmList>> GetRestorationAlarmListTimeDscAsync()
         {
             RestEventArgs args = new RestEventArgs();
 
@@ -82,7 +82,8 @@ namespace SmartAlarmAgent.Repository
                 args.TimeStamp = DateTime.Now;
 
                 return await _RestAlarmContext.RestorationAlarmList
-                    .OrderBy(c => c.DateTime)
+                    .OrderByDescending(c => c.DateTime)
+                    .Take(1)
                     .ToListAsync< RestorationAlarmList>();
 
                 //var LastRestAlarmPoint = _RestAlarmContext.RestorationAlarmList.LastOrDefault();
