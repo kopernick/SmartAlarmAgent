@@ -113,7 +113,7 @@ namespace SmartAlarmAgent.Model
         private void dispatcherTimerClearAct_Tick(object sender, EventArgs e)
         {
             Time = DateTime.Now.ToLongTimeString();
-            if (Time.Equals("12:00:00 AM"))
+            if (Time.Equals("12:00:00 AM") || Time.Equals("00:00:00"))
                 ListEventLog.Clear();
         }
 

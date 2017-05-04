@@ -85,9 +85,6 @@ namespace SmartAlarmAgent.Repository
                     .OrderByDescending(c => c.DateTime)
                     .Take(1)
                     .ToListAsync< RestorationAlarmList>();
-
-                //var LastRestAlarmPoint = _RestAlarmContext.RestorationAlarmList.LastOrDefault();
-                //return LastRestAlarmPoint;
             }
             catch
             {
