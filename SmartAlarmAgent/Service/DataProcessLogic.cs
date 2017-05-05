@@ -403,7 +403,7 @@ namespace SmartAlarmAgent.Service
 
         }
 
-        private async Task<bool> ProcessPoint(int StatartIndex, RestEventArgs args)
+        private async Task<bool> ProcessPoint(int StartIndex, RestEventArgs args)
         {
             this._nNewRestPoint = 0;
 
@@ -414,12 +414,12 @@ namespace SmartAlarmAgent.Service
 
             _flgMatchingInProgress = true;
 
-            for (int iIndex = StatartIndex + 1; iIndex < _mAlarmList.ListAlarm.Count; iIndex++)
+            for (int iIndex = StartIndex + 1; iIndex < _mAlarmList.ListAlarm.Count; iIndex++)
             {
                 AlarmList al = _mAlarmList.ListAlarm[iIndex];
                 if (al.pointType != PointType.Digital) continue;
 
-                var groupByStations = _DigitalPointInfoList.Where(c => c.StationName.Trim() == al.StationName.Trim());// Groupong Station before Mapping
+                var groupByStations = _DigitalPointInfoList.Where(c => c.StationName.Trim() == al.StationName.Trim());// Grouping Station before Mapping
 
                 RestorationAlarmList point = _mAlarmList.GetRestorationAlarmPoint(al, groupByStations); //Mapping CSV Point --> DigitalPointInfo Table
 
@@ -453,7 +453,7 @@ namespace SmartAlarmAgent.Service
                 {
                     LastRestAlarmPoint = RestAlarmPointList.FirstOrDefault(); //Get Last Record
                 }
-                args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StatartIndex - 1).ToString() + $" Alarm(s),:=> { _nNewRestPoint} Restoration Alarm(s)";
+                args.message = args.message + " " + (_mAlarmList.ListAlarm.Count - StartIndex - 1).ToString() + $" Alarm(s),:=> { _nNewRestPoint} Restoration Alarm(s)";
 
                 _mAlarmList.nStartIndex = _mAlarmList.ListAlarm.Count - 1; // Index start with 0
                 _mAlarmList.nLastAlarmRecIndex = (int)_mAlarmList.ListAlarm[_mAlarmList.ListAlarm.Count - 1].RecIndex; //Update LastAlarm Index

@@ -117,6 +117,7 @@
           </ReferentialConstraint>
         </Association>
         <Function Name="BackUpDigitalPointInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
+        <Function Name="UpDateDigitalPointInfo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" />
         <EntityContainer Name="RestorationAlarmDataStoreContainer">
           <EntitySet Name="Device" EntityType="Self.Device" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DigitalPointInfo" EntityType="Self.DigitalPointInfo" Schema="dbo" store:Type="Tables" />
@@ -256,6 +257,7 @@
             <End Role="DigitalPointInfo" EntitySet="DigitalPointInfo" />
           </AssociationSet>
           <FunctionImport Name="BackUpDigitalPointInfo" />
+          <FunctionImport Name="UpDateDigitalPointInfo" />
         </EntityContainer>
       </Schema>
     </edmx:ConceptualModels>
@@ -368,6 +370,7 @@
             </EntityTypeMapping>
           </EntitySetMapping>
           <FunctionImportMapping FunctionImportName="BackUpDigitalPointInfo" FunctionName="RestorationAlarmData.Store.BackUpDigitalPointInfo" />
+          <FunctionImportMapping FunctionImportName="UpDateDigitalPointInfo" FunctionName="RestorationAlarmData.Store.UpDateDigitalPointInfo" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

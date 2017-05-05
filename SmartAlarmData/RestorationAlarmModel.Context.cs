@@ -37,5 +37,10 @@ namespace SmartAlarmData
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("BackUpDigitalPointInfo");
         }
+    
+        public virtual int UpDateDigitalPointInfo()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("UpDateDigitalPointInfo");
+        }
     }
 }
