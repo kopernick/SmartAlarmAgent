@@ -55,7 +55,7 @@ namespace SmartAlarmAgent.Model
         private void OnAlarmListChanged(object sender, EventChangedEventArgs e)
         {
             eventArg = e;
-            Console.WriteLine("Recieving Mas from DataProcessLogic");
+            Console.WriteLine("Receive Msg. from DataProcessLogic");
             //if(e.UpdatePost != null)
             {
                 Task.Factory.StartNew(UpdateActivityConsole);

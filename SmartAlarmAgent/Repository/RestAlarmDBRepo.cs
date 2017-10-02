@@ -1,4 +1,10 @@
-﻿using System;
+﻿/****
+ * 
+ *  Code First for Edit DB Migration
+ * 
+ ****/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
