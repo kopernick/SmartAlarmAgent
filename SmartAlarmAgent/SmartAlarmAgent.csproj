@@ -51,6 +51,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Controls.Ribbon" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -76,11 +77,17 @@
     <Compile Include="Repository\RestAlarmDBRepo.cs" />
     <Compile Include="Repository\RestorationAlarmDBRepo.cs" />
     <Compile Include="Model\ActivityMonitorViewModel.cs" />
+    <Compile Include="Model\ConnectionConfig.cs" />
     <Compile Include="Service\DataProcessLogic.cs" />
     <Compile Include="Service\PropertyChangeEventBase.cs" />
+    <Compile Include="Service\RelayCommand .cs" />
     <Compile Include="Service\RestEventArgs.cs" />
+    <Compile Include="Service\WaitCursor.cs" />
     <Compile Include="Views\ActivityMonitorView.xaml.cs">
       <DependentUpon>ActivityMonitorView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ConnSetting.xaml.cs">
+      <DependentUpon>ConnSetting.xaml</DependentUpon>
     </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -95,6 +102,10 @@
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\ActivityMonitorView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ConnSetting.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

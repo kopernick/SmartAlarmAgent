@@ -13,8 +13,22 @@ namespace SmartAlarmAgent.Repository
 {
      class AlarmListCSVRepo
     {
-        
+
         #region Properties
+
+        private ConnectionConfig _connCfg;
+        public ConnectionConfig ConnCfg
+        {
+            get
+            {
+                return _connCfg;
+            }
+            set
+            {
+                _connCfg = value;
+            }
+        }
+
         private int _nLastAlarmRecIndex;
         public int nLastAlarmRecIndex
         {
@@ -26,6 +40,7 @@ namespace SmartAlarmAgent.Repository
         public DateTime CSVLastModify
         {
             get { return _CSVLastModify; }
+            set { _CSVLastModify = value; }
         }
 
         private string _CSVFile;
@@ -33,7 +48,7 @@ namespace SmartAlarmAgent.Repository
         {
             get { return _CSVFile; }
         }
-        
+
         public DateTime dLastLoadDB { get; set; }
         public DateTime dLastReadCSV { get; set; }
         public DateTime dLastInsertRestAlarm { get; set; }
@@ -70,7 +85,7 @@ namespace SmartAlarmAgent.Repository
         #endregion Properties
 
         #region Event & Delegate
-        public static event EventHandler<RestEventArgs> RestAlarmCSVChanged;
+        public event EventHandler<RestEventArgs> RestAlarmCSVChanged;
         private void onRestAlarmCSVChanged(RestEventArgs arg)
         {
             if (RestAlarmCSVChanged != null)
@@ -86,10 +101,14 @@ namespace SmartAlarmAgent.Repository
             this._nLastAlarmRecIndex = -1;
             this._nLastRestAlarmID = 0;
             this._nStartIndex = -1;
-            _CSVFile = null;
 
             this._listAlarm = new List<AlarmList>();
 
+        }
+        public AlarmListCSVRepo(ConnectionConfig connCfg)
+            :this()
+        {
+            this._connCfg = connCfg;
         }
 
         #endregion Constructor
@@ -114,7 +133,7 @@ namespace SmartAlarmAgent.Repository
 
 
 #if true
-                FileInfo file = new FileInfo(_CSVFile);
+                FileInfo file = new FileInfo(this._connCfg.CsvFile);
                 var DateModification = file.LastWriteTime;
 
                 if (_CSVLastModify == DateModification)
@@ -140,9 +159,9 @@ namespace SmartAlarmAgent.Repository
                         onRestAlarmCSVChanged(args); //Raise the Event
                         return null;
                     }
-                } while (IsFileLocked(_CSVFile));
+                } while (IsFileLocked(this._connCfg.CsvFile));
 
-                this._listAlarm = File.ReadLines(_CSVFile)
+                this._listAlarm = File.ReadLines(this._connCfg.CsvFile)
                             .Skip(1)
                             .Select(line => AlarmList.GetLineAlarmListCsv(line))
                             .ToList();

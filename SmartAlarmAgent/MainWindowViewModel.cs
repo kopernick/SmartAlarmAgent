@@ -10,6 +10,8 @@ using SmartAlarmAgent.Service;
 using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
+using SmartAlarmAgent.Views;
 
 namespace SmartAlarmAgent
 {
@@ -20,7 +22,11 @@ namespace SmartAlarmAgent
         private DispatcherTimer m_dispatcherTimerCSV = new System.Windows.Threading.DispatcherTimer();
         private DispatcherTimer m_dispatcherTimerClock = new System.Windows.Threading.DispatcherTimer();
 
+        private ConnectionConfig _connCfg = new ConnectionConfig();
         public DataProcessLogic DataProcessor { get; private set; }
+
+        public ConnSetting ConnSettingView; //Child window:MainWindow
+        public ICommand RunConnSetting { get; private set; }
 
         private bool _flgMatchingInProgress;
         public bool flgStart
@@ -50,11 +56,11 @@ namespace SmartAlarmAgent
         #region Constructor
         public MainWindowViewModel()
         {
-            
+            _connCfg.LoadConfiguration();
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
-            DataProcessor = new DataProcessLogic();
-
+            DataProcessor = new DataProcessLogic(this._connCfg);
+            RunConnSetting = new RelayCommand(o => ConnSetting(), o => canConnSetting());
             Initializer();
             Console.WriteLine("Skip");
         }
@@ -76,6 +82,7 @@ namespace SmartAlarmAgent
             this.m_dispatcherTimerClock.Start();
             this.m_dispatcherTimerClock.Tick += dispatcherTimerClock_Tick;
         }
+
         private async void dispatcherTimerCSV_Tick(object sender, EventArgs e)
         {
             if (DataProcessor.flgStart == true)
@@ -94,5 +101,57 @@ namespace SmartAlarmAgent
         }
 
         #endregion Methode
+
+        #region Helper
+
+        private bool canConnSetting()
+        {
+            return true;
+        }
+
+        private void ConnSetting()
+        {
+            //TODO
+
+#if false
+            Thread t = new Thread(StartConnSetting);
+            t.SetApartmentState(ApartmentState.STA);
+            t.Start();
+
+#else
+            Task t = new Task(StartConnSetting);
+            t.RunSynchronously();
+#endif
+
+
+
+        }
+
+        private void StartConnSetting()
+        {
+
+            ConnSettingView = new ConnSetting(this._connCfg); //Init Sort Condition By Create Instance SortFieldView
+
+            ConnSettingView.ShowInTaskbar = true;
+
+            ConnSettingView.ShowDialog();
+            if (ConnSettingView.DialogResult == ConnDialogResult.OK ||
+                ConnSettingView.DialogResult == ConnDialogResult.APPLY)
+            {
+                this._connCfg.SaveConfiguration();
+
+                DataProcessor.ConnCfg = this._connCfg;
+                _flgMatchingInProgress = false;
+               
+                DataProcessor.RefreshConnect( this._connCfg); //Refresh Connection Setting
+               
+                Console.WriteLine("ConnSetting was Saved");
+            }
+            else
+            {
+                Console.WriteLine("ConnSetting was Canceled");
+            }
+        }
+        #endregion Helper
     }
 }

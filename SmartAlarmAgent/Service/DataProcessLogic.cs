@@ -18,6 +18,20 @@ namespace SmartAlarmAgent.Service
 
         #region Properties
 
+        private ConnectionConfig _connCfg;
+        public ConnectionConfig ConnCfg
+        {
+            get
+            {
+                return _connCfg;
+            }
+            set
+            {
+                _connCfg = value;
+                OnPropertyChanged(nameof(ConnCfg));
+            }
+        }
+
         private int _nLastAlarmRecIndex;
         public int nLastAlarmRecIndex
         {
@@ -49,7 +63,6 @@ namespace SmartAlarmAgent.Service
         {
             get { return _listAlarm; }
         }
-
         private string _CSVFile;
         public string CSVFile
         {
@@ -64,7 +77,6 @@ namespace SmartAlarmAgent.Service
                 OnPropertyChanged(nameof(CSVFile));
             }
         }
-
         private string _CSVStatus;
         public string CSVStatus
         {
@@ -230,15 +242,20 @@ namespace SmartAlarmAgent.Service
 
 
         #region Constructor
-        public DataProcessLogic()
+        public DataProcessLogic(ConnectionConfig connCfg)
         {
-            _mAlarmList = new AlarmListCSVRepo();
-            _mRestorationAlarmList = new RestorationAlarmDBRepo();
+            _connCfg = connCfg;
+
+            _mAlarmList = new AlarmListCSVRepo(_connCfg);
+            _mRestorationAlarmList = new RestorationAlarmDBRepo(_connCfg);
+
             //_mRestAlarmList = new RestAlarmDBRepo();                //Test EF
 
-            AlarmListCSVRepo.RestAlarmCSVChanged += OnAlarmListChanged;
+            //AlarmListCSVRepo.RestAlarmCSVChanged += OnAlarmListChanged;
+            _mAlarmList.RestAlarmCSVChanged += OnAlarmListChanged;
 
-            RestorationAlarmDBRepo.RestAlarmDBChanged += OnDBChanged;
+            //RestorationAlarmDBRepo.RestAlarmDBChanged += OnDBChanged;
+            _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged;
 
             LastRestAlarmPoint = null;
 
@@ -246,11 +263,40 @@ namespace SmartAlarmAgent.Service
 
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
-            this.nLastAlarmRecIndex = 0;
+            this.nLastAlarmRecIndex = -1;
 
             Console.WriteLine("Skip");
         }
         #endregion Constructor
+
+        #region Methode
+
+        public void RefreshConnect(ConnectionConfig connCfg)
+        {
+            _connCfg = connCfg;
+
+            //Set Connection for CSV Repo [ Change only file Info] 
+            _mAlarmList.ConnCfg = _connCfg; 
+
+            //Re Create Database Repository [Can not set by only Connection string]
+            _mRestorationAlarmList = new RestorationAlarmDBRepo(_connCfg);  
+            _mRestorationAlarmList.RestAlarmDBChanged += OnDBChanged; //Subcribe to RestAlarmDBChanged Event
+
+            LastRestAlarmPoint = null;
+
+            _mAlarmList.nLastAlarmRecIndex = -1; //Start Mode
+            _flgMatchingInProgress = false;
+            this._nNewRestPoint = 0;
+            this.nLastAlarmRecIndex = -1;
+
+            _mAlarmList.CSVLastModify = DateTime.Now.AddYears(-1); //Reset CSV file's Last Mod date
+            GetCSVData(); //Restart Get CSV data
+
+        }
+
+        #endregion Methode 
+
+        #region Helper
 
         public async void GetCSVData()
         {
@@ -325,6 +371,8 @@ namespace SmartAlarmAgent.Service
             {
                 Console.WriteLine("DBConnection Error");
                 _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
+
+                UpdateConnectionStatus(args, "DBStatus", false);//Update Database File Status
                 return false;
             }
 
@@ -379,6 +427,8 @@ namespace SmartAlarmAgent.Service
 
             if (_DigitalPointInfoList == null)
                 return false;                         //Can't Access Database
+
+           // UpdateConnectionStatus(args, "DBStatus", true);//Update Database File Status
             return await ProcessPoint(StartIndex, args);
 
         }
@@ -390,6 +440,7 @@ namespace SmartAlarmAgent.Service
             {
                 Console.WriteLine("DBConnection Error");
                 _mAlarmList.nLastAlarmRecIndex = -1; // Reset to Ready State for Start Next time when DB Connected
+                UpdateConnectionStatus(args, "DBStatus", false);//Update Database File Status
                 return false;
             }
 
@@ -399,6 +450,7 @@ namespace SmartAlarmAgent.Service
             if (_DigitalPointInfoList == null)
                 return false;                         //Can't Access Database
 
+            //UpdateConnectionStatus(args, "DBStatus", true);//Update Database File Status
             return await ProcessPoint(_mAlarmList.nStartIndex, args);
 
         }
@@ -533,11 +585,12 @@ namespace SmartAlarmAgent.Service
             
             var LastCsvItem = _mAlarmList.ListAlarm.LastOrDefault(); //Get First CSV Item
 
-            if (_target == "CSVStatus")
+           if (_target == "CSVStatus")
             {
                 CSVLastModify = _mAlarmList.CSVLastModify;
                 CSVStatus = state ? "Connection OK" : "Connection Fail";
-                CSVFile = _mAlarmList.CSVFile;
+                
+                CSVFile = this._connCfg.CsvFile;
                 CSVLastAlarm = LastCsvItem != null ? (LastCsvItem.Time.ToString() + " : " + LastCsvItem.PointName) : "Non";
                 CSVBackgroundColor = state ? Brushes.Green : Brushes.Red;
             }
@@ -546,12 +599,13 @@ namespace SmartAlarmAgent.Service
                 //var db = new RestorationAlarmDbContext();
                 DBLastAccess = args.TimeStamp;
                 DBStatus = state ? "Database Connected" : "Can't Connect to Database";
-                DBName = _mRestorationAlarmList.RestAlarmContext.Database.Connection.DataSource.ToString();
-
+                
+                DBName = this._connCfg.Server + ": " + this._connCfg.Database;
                 DBSLastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non";
                 DBBackgroundColor = state ? Brushes.Green : Brushes.Red;
             }
         }
+#endregion Helper
 
     }
 }

@@ -20,6 +20,19 @@ namespace SmartAlarmAgent.Repository
     {
         #region Properties
 
+        private ConnectionConfig _connCfg;
+        public ConnectionConfig ConnCfg
+        {
+            get
+            {
+                return _connCfg;
+            }
+            set
+            {
+                _connCfg = value;
+            }
+        }
+
         private RestorationAlarmDbContext _RestAlarmContext;
         public RestorationAlarmDbContext RestAlarmContext
         {
@@ -38,7 +51,7 @@ namespace SmartAlarmAgent.Repository
         #endregion Properties
 
         #region Event & Delegate
-        public static  event EventHandler<RestEventArgs> RestAlarmDBChanged;
+        public event EventHandler<RestEventArgs> RestAlarmDBChanged;
         private void onRestAlarmDBChanged(RestEventArgs arg)
         {
             if (RestAlarmDBChanged != null)
@@ -52,18 +65,47 @@ namespace SmartAlarmAgent.Repository
             this._RestAlarmContext = new RestorationAlarmDbContext();
         }
 
+        //Constructor overload
+        public RestorationAlarmDBRepo(ConnectionConfig connCfg)
+        {
+            this._connCfg = connCfg;
+
+            this._RestAlarmContext = new RestorationAlarmDbContext(GetSQLConnString());
+        }
+
         #endregion Constructor
 
         #region Methode
+
+        public string GetSQLConnString()
+        {
+            var sql = @"metadata=res://*/RestorationAlarmModel.csdl|res://*/RestorationAlarmModel.ssdl|res://*/RestorationAlarmModel.msl;" +
+           @"provider = System.Data.SqlClient;" +
+           @"provider connection string=""" +
+           "data source = "+ _connCfg.Server + ";" +
+          "initial catalog = " + _connCfg.Database + ";" +
+          "user id = " + _connCfg.Login + ";" +
+          "password = " + _connCfg.Password + ";" +
+           @"multipleactiveresultsets = True;" +
+           @"App = EntityFramework ;" +
+            //@"providerName = " + @"/"System.Data.EntityClient/"" +
+           @"""";
+
+            return sql;
+
+        }
+
         public async Task<List<DigitalPointInfo>> GetAllDigitalPointInfoAsync()
         {
 
             try
             {
+                //ToDo Reconnect Db
+                //this._RestAlarmContext = RestorationAlarmDbContext(cnString);
 
                 Console.WriteLine(DateTime.Now.ToString() + " : GetAllDigitalPointInfo Read DB Success");
 
-                return await _RestAlarmContext.DigitalPointInfo
+                return await this._RestAlarmContext.DigitalPointInfo
                     .Where(c => !(string.IsNullOrEmpty(c.MACName)))
                     .ToListAsync<DigitalPointInfo>();
             }
@@ -87,7 +129,7 @@ namespace SmartAlarmAgent.Repository
                 args.message = "Read DB Success";
                 args.TimeStamp = DateTime.Now;
 
-                return await _RestAlarmContext.RestorationAlarmList
+                return await this._RestAlarmContext.RestorationAlarmList
                     .OrderByDescending(c => c.DateTime)
                     .Take(1)
                     .ToListAsync< RestorationAlarmList>();
@@ -112,7 +154,7 @@ namespace SmartAlarmAgent.Repository
         {
             RestEventArgs args = new RestEventArgs();
 
-            var isExist = RestAlarmContext.Database.Exists();
+            var isExist = this._RestAlarmContext.Database.Exists();
             if (isExist)
                 args.message = "Connected";
             else
@@ -127,7 +169,7 @@ namespace SmartAlarmAgent.Repository
 
         public void Complete()
         {
-            RestAlarmContext.SaveChanges();
+            this._RestAlarmContext.SaveChanges();
         }
 
 

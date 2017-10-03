@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:SmartAlarmAgent"
         xmlns:Activity="clr-namespace:SmartAlarmAgent.Views"
         mc:Ignorable="d"
-        Title="SmartAlarm Agent" Height="380" Width="480" MinHeight="200"  MinWidth="580" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
+        Title="SmartAlarm Agent" Height="380" Width="680" MinHeight="200"  MinWidth="680" ResizeMode="CanResizeWithGrip" WindowStartupLocation="CenterScreen">
 
     <Grid>
         <Grid.Resources>
@@ -25,12 +25,28 @@
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition />
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
+        
         <!--ToolBar-->
-        <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0" Margin="5">
+        <Menu DockPanel.Dock="Top" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+
+            <MenuItem Header="_File">
+                <MenuItem Header="_Conn. Setting" Command="{Binding RunConnSetting}">
+                    <MenuItem.Icon>
+                        />
+                    </MenuItem.Icon>
+                </MenuItem>
+
+                <MenuItem Header="Close" Command="ApplicationCommands.Close" />
+            </MenuItem>
+
+        </Menu>
+        
+        <!--ToolBar-->
+        <Grid DockPanel.Dock="Top" Grid.Row="1" Grid.Column="0" Margin="5">
             <Grid>
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width="Auto"/>
@@ -82,7 +98,7 @@
             </Grid>
         </Grid>
 
-        <Grid DockPanel.Dock="Top" Grid.Row="0" Grid.Column="2" Grid.ColumnSpan="2" Margin="5">
+        <Grid DockPanel.Dock="Top" Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Margin="5">
             <Grid >
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width="Auto"/>
@@ -135,7 +151,7 @@
         </Grid>
         
         
-        <Grid DockPanel.Dock ="Top" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
+        <Grid DockPanel.Dock ="Top" Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="2" Margin="5">
             <Activity:ActivityMonitorView x:Name="ActivityView" />
 
             <!--HorizontalAlignment="Stretch" Width="Auto" 
@@ -143,14 +159,14 @@
 
         </Grid>
         
-        <Label DockPanel.Dock ="Bottom" x:Name="lblTime" Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="1"
+        <Label DockPanel.Dock ="Bottom" x:Name="lblTime" Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="1"
                Content="{Binding Time}" Width="Auto" Margin="2" 
                VerticalAlignment="Center" VerticalContentAlignment="Center" 
                FontSize="12" Foreground="#FF84AD17" 
                HorizontalContentAlignment="Right"/>
 
 
-        <StatusBarItem Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="1" Margin="2" >
+        <StatusBarItem Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="1" Margin="2" >
             <StackPanel Orientation="Horizontal">
                 <Label Content="Current RecIndex :"/>
                 <Label x:Name="curRecIndex" Margin="10,0"  Width="Auto"
