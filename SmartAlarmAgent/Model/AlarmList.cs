@@ -9,7 +9,7 @@ using Microsoft.VisualBasic.FileIO;
 
 namespace SmartAlarmAgent.Model
 {
-     class AlarmList
+     public class AlarmList
         {
             private UInt32 m_nRecIndex;
             public UInt32 RecIndex

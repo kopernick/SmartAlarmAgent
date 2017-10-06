@@ -11,7 +11,7 @@ using SmartAlarmData;
 
 namespace SmartAlarmAgent.Repository
 {
-     class AlarmListCSVRepo
+    public class AlarmListCSVRepo
     {
 
         #region Properties
@@ -128,7 +128,7 @@ namespace SmartAlarmAgent.Repository
 
             try
             {
-                _CSVFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
+                //_CSVFile = @"\\10.20.86.210\ExportDB\AlarmList.csv";
                 // string csvFile = @"c:\ExportDB\AlarmList.csv";
 
 
@@ -244,7 +244,7 @@ namespace SmartAlarmAgent.Repository
 
                     if (this._nStartIndex == iStartIndex)
                     {
-                        args.message = "Has No New Alarm";
+                        args.message = "No New Alarm";
                         args.TimeStamp = DateTime.Now;
                         onRestAlarmCSVChanged(args);
 

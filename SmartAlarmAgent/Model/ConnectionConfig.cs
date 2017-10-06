@@ -15,6 +15,8 @@ namespace SmartAlarmAgent.Model
         public string Database { get; set; }
         public string CsvDirectory { get; set; }
         public string CsvFile { get; set; }
+        public string CurrYearMont { get; set; }
+
         public ConnectionConfig()
         {
 
@@ -26,13 +28,45 @@ namespace SmartAlarmAgent.Model
             try
             {
                 Microsoft.Win32.RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SmartAlarmConfig");
-                this.Server = reg.GetValue("Server").ToString();
-                this.CsvDirectory = reg.GetValue("CSVPath").ToString();
-                this.Login = reg.GetValue("Login").ToString();
-                this.Password = reg.GetValue("Password").ToString();
-                this.CsvFile = reg.GetValue("CsvFile").ToString();
-                this.Database = reg.GetValue("Database").ToString();
 
+                if (reg.GetValue("Server") == null)
+                    this.Server = "";
+                else
+                    this.Server = reg.GetValue("Server").ToString();
+
+                if (reg.GetValue("CSVPath") == null)
+                    this.CsvDirectory = "";
+                else
+                    this.CsvDirectory = reg.GetValue("CSVPath").ToString();
+
+                if (reg.GetValue("Login") == null)
+                    this.Login = "";
+                else
+                    this.Login = reg.GetValue("Login").ToString();
+
+                if (reg.GetValue("Password") == null)
+                    this.Password = "";
+                else
+                    this.Password = reg.GetValue("Password").ToString();
+
+                if (reg.GetValue("CsvFile") == null)
+                    this.CsvFile = "";
+                else
+                    this.CsvFile = reg.GetValue("CsvFile").ToString() ?? "";
+                
+
+                if (reg.GetValue("Database") == null)
+                    this.Database = "";
+                else
+                    this.Database = reg.GetValue("Database").ToString();
+
+
+                if (reg.GetValue("CurrentYearMont") == null)
+                    this.CurrYearMont = "0";
+                else
+                    this.CurrYearMont = reg.GetValue("CurrentYearMont").ToString();
+                
+                
                 reg.Close();
 
                 //this.m_dtPointConfiguration = new DataTable("PointConfiguration");
@@ -58,7 +92,8 @@ namespace SmartAlarmAgent.Model
                 reg.SetValue("Password", this.Password);
                 reg.SetValue("CsvFile", this.CsvFile);
                 reg.SetValue("Database", this.Database);
-                
+                reg.SetValue("CurrentYearMont", this.CurrYearMont);
+
                 reg.Close();
             }
             catch (Exception err)
@@ -66,13 +101,29 @@ namespace SmartAlarmAgent.Model
                 System.Diagnostics.Debug.WriteLine(err.Message);
             }
         }
+        public void SaveCurrentMonth(string currMont)
+        {
+            this.CurrYearMont = currMont;
 
+            try
+            {
+                Microsoft.Win32.RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SmartAlarmConfig", true);
+                reg.SetValue("CurrentYearMont", this.CurrYearMont);
+
+                reg.Close();
+            }
+            catch (Exception err)
+            {
+                System.Diagnostics.Debug.WriteLine(err.Message);
+            }
+
+        }
     }
 
     public enum ConnDialogResult
     {
-        Cencel,
-        OK,
+        CANCEL,
+        SAVE,
         APPLY
     };
 

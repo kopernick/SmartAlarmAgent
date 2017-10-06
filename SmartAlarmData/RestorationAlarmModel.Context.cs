@@ -20,14 +20,12 @@ namespace SmartAlarmData
         public RestorationAlarmDbContext()
             : base("name=RestorationAlarmDbContext")
         {
-
         }
 
         //Constructor overload
         public RestorationAlarmDbContext(string connectionString)
-        : base(connectionString)
+            : base(connectionString)
         {
-
         }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
@@ -49,6 +47,16 @@ namespace SmartAlarmData
         public virtual int UpDateDigitalPointInfo()
         {
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("UpDateDigitalPointInfo");
+        }
+    
+        public virtual int BackUpRAW()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("BackUpRAW");
+        }
+    
+        public virtual int UpdateDeviceID()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("UpdateDeviceID");
         }
     }
 }

@@ -21,17 +21,6 @@ namespace SmartAlarmAgent.Repository
         #region Properties
 
         private ConnectionConfig _connCfg;
-        public ConnectionConfig ConnCfg
-        {
-            get
-            {
-                return _connCfg;
-            }
-            set
-            {
-                _connCfg = value;
-            }
-        }
 
         private RestorationAlarmDbContext _RestAlarmContext;
         public RestorationAlarmDbContext RestAlarmContext

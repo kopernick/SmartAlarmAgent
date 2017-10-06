@@ -13,7 +13,7 @@ using System.Windows.Media;
 
 namespace SmartAlarmAgent.Service
 {
-    class DataProcessLogic : PropertyChangeEventBase
+    public class DataProcessLogic : PropertyChangeEventBase
     {
 
         #region Properties
@@ -205,10 +205,12 @@ namespace SmartAlarmAgent.Service
         }
 
         private readonly List<RestorationAlarmList> RestAlarmList = new List<RestorationAlarmList>();
+
         private static AlarmListCSVRepo _mAlarmList;
         public AlarmListCSVRepo mAlarmList
         {
             get { return _mAlarmList; }
+            set {  _mAlarmList = value; }
         }
 
         private static RestorationAlarmDBRepo _mRestorationAlarmList;
@@ -265,13 +267,12 @@ namespace SmartAlarmAgent.Service
             this._nNewRestPoint = 0;
             this.nLastAlarmRecIndex = -1;
 
-            Console.WriteLine("Skip");
         }
         #endregion Constructor
 
         #region Methode
 
-        public void RefreshConnect(ConnectionConfig connCfg)
+        public void RefreshConnection(ConnectionConfig connCfg)
         {
             _connCfg = connCfg;
 
@@ -290,6 +291,7 @@ namespace SmartAlarmAgent.Service
             this.nLastAlarmRecIndex = -1;
 
             _mAlarmList.CSVLastModify = DateTime.Now.AddYears(-1); //Reset CSV file's Last Mod date
+
             GetCSVData(); //Restart Get CSV data
 
         }
@@ -342,7 +344,7 @@ namespace SmartAlarmAgent.Service
                     await this.onHasNewAlarm(args);
                     break;
 
-                case "Has No New Alarm":
+                case "No New Alarm":
                     Console.WriteLine(args.TimeStamp.ToString() + " : No New Alarm");
                     UpdateActivityMonitor(args, "Activity");
 
@@ -521,7 +523,9 @@ namespace SmartAlarmAgent.Service
             }
             catch
             {
-                Console.WriteLine("Error on Save to DB");
+                Console.WriteLine("Error while Inser to DB");
+                args.message = "Error while inser to DB";
+                UpdateActivityMonitor(args, "Activity");
                 return true;
             }
             finally

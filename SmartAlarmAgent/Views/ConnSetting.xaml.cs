@@ -33,6 +33,7 @@ namespace SmartAlarmAgent.Views
         private string fileDirectory;
         private string database;
         private string file;
+        private DataProcessLogic _dataProcessor;
 
         private OpenFileDialog openFolderDialog { get; set; }
 
@@ -44,12 +45,14 @@ namespace SmartAlarmAgent.Views
             InitializeComponent();
 
         }
-        public ConnSetting(ConnectionConfig connCfg)
+        public ConnSetting(ConnectionConfig connCfg, DataProcessLogic DataProcessor)
             : this()
         {
 
             this.DialogResult = null;
             this._connCfg = connCfg;
+            this._dataProcessor = DataProcessor;
+            //this.nLastAlarmRecIndex = DataProcessor.mAlarmList.nLastAlarmRecIndex;
 
             this.txtServer.Text = _connCfg.Server;
             this.txtLogin.Text = _connCfg.Login;
@@ -77,8 +80,24 @@ namespace SmartAlarmAgent.Views
             _connCfg.CsvDirectory = this.txtCSVPath.Text;
             _connCfg.CsvFile = this.txtCSVPath.Text + "\\AlarmList.csv";
 
-            this.DialogResult = ConnDialogResult.OK;
-            Close();
+            MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Do you want to save changes ?", 
+                "Save Connection Setting", System.Windows.MessageBoxButton.YesNo);
+
+            if (messageBoxResult == MessageBoxResult.Yes)
+            {
+                _connCfg.SaveConfiguration();
+
+                _dataProcessor.ConnCfg = this._connCfg;
+                _dataProcessor.RefreshConnection(this._connCfg); //Refresh Connection Setting
+                Console.WriteLine("ConnSetting was Saved");
+                this.DialogResult = ConnDialogResult.SAVE;
+                Close();
+            }
+            else
+            {
+                this.DialogResult = ConnDialogResult.CANCEL;
+            }
+
         }
 
         private void btnApply_Click(object sender, RoutedEventArgs e)
@@ -90,15 +109,45 @@ namespace SmartAlarmAgent.Views
             _connCfg.CsvDirectory = this.txtCSVPath.Text;
             _connCfg.CsvFile = this.txtCSVPath.Text + "\\AlarmList.csv";
 
+            _dataProcessor.ConnCfg = _connCfg;
+            _dataProcessor.RefreshConnection(_connCfg); //Refresh Connection Setting
+
+            Console.WriteLine("ConnSetting was Apply");
             this.DialogResult = ConnDialogResult.APPLY;
 
         }
 
-        protected override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e) //Override Close Methode
         {
-            //this.DialogResult = ConnDialogResult.Cencel;
-            //e.Cancel = true; //Not Close 
-            //this.Close(); //Hide View
+
+            if (this.DialogResult != ConnDialogResult.SAVE)
+            {
+                if (this.DialogResult == ConnDialogResult.APPLY)
+                {
+                    MessageBoxResult messageBoxResult = System.Windows.MessageBox.Show("Do you want to keep changes ?",
+                        "Connection Setting Confirmation", System.Windows.MessageBoxButton.YesNo);
+
+                    if (messageBoxResult == MessageBoxResult.Yes)
+                    {
+                        _connCfg.SaveConfiguration();
+                        Console.WriteLine("Keep changes ConnSetting");
+                    }
+                    else
+                    {
+                        _connCfg.LoadConfiguration();
+                        _dataProcessor.ConnCfg = _connCfg;
+                        _dataProcessor.RefreshConnection(_connCfg); //Refresh Connection Setting
+                        Console.WriteLine("ConnSetting was Reload");
+                    }
+
+                }
+                else
+                {
+                    //ConnDialogResult.CANCEL
+                    Console.WriteLine("ConnSetting was Canceled !");
+                }
+               
+            }
         }
 
         private void btnBrowse_Click(object sender, RoutedEventArgs e)
@@ -179,9 +228,6 @@ namespace SmartAlarmAgent.Views
 
         public string GetSQLConnString()
         {
-
-#if true
-            
           var sql = @"metadata=res://*/RestorationAlarmModel.csdl|res://*/RestorationAlarmModel.ssdl|res://*/RestorationAlarmModel.msl;" +
                @"provider = System.Data.SqlClient;" +
                @"provider connection string=""" +
@@ -196,33 +242,10 @@ namespace SmartAlarmAgent.Views
 
                 return sql;
 
-#else
-
-            string sql = " user id = " + this.txtLogin.Text + ";" +
-                         " password = " + this.txtPassword.Password + ";" +
-                         " server = " + this.txtServer.Text + ";" +
-                         " database = " + this.txtSelectedDB.Content + ";" +
-                         @" Integrated Security = true;
-                            Trusted_Connection = no;
-                            database = AlarmAbnormalOnline;
-                            connection timeout = 30;";
-            return sql;
-
-            return @"
-                       user id = macapp;
-                       password = mac;
-                       server = 10.20.86.119\MAODSCADA;
-                       Integrated Security = true;
-                       Trusted_Connection = no;
-                       database = AlarmAbnormalOnline;
-                       connection timeout=30
-                     ";
-#endif
         }
 
         public string GetDefualtSQLConnString()
         {
-
             var sql = @"metadata=res://*/RestorationAlarmModel.csdl|res://*/RestorationAlarmModel.ssdl|res://*/RestorationAlarmModel.msl;" +
               @"provider = System.Data.SqlClient;" +
               @"provider connection string=""" +
@@ -256,7 +279,7 @@ namespace SmartAlarmAgent.Views
 
         }
 
-        public bool IsServerConnected(string connectionString)
+        public void TestConnected(string connectionString)
         {
             //RestEventArgs args = new RestEventArgs();
             var _RestAlarmContext = new RestorationAlarmDbContext(connectionString);
@@ -268,11 +291,15 @@ namespace SmartAlarmAgent.Views
                 
                 _RestAlarmContext.Database.Connection.Close();
                 Console.WriteLine("Connect Success");
-                return true;
+                System.Windows.Forms.MessageBox.Show("Connect to: " + this.txtServer.Text + "; " + this.txtSelectedDB.Content + " Success", "Check SQL Connection"
+                       , MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            catch
+            catch (Exception e)
             {
-                return false;
+                Console.WriteLine(e.Message);
+                System.Windows.Forms.MessageBox.Show(e.Message, "Check SQL Connection"
+                       , MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
             }
         }
 
@@ -281,16 +308,7 @@ namespace SmartAlarmAgent.Views
         {
             using (new WaitCursor())
             {
-                if (IsServerConnected(GetCurrentSQLConnString()))
-                {
-                    System.Windows.Forms.MessageBox.Show("Connect to: " + this.txtServer.Text + "; " + this.txtSelectedDB.Content + " Success", "Check SQL Connection"
-                        , MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
-                else
-                {
-                    System.Windows.Forms.MessageBox.Show("Invalid User name or Password", "Check SQL Connection"
-                        , MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                }
+                TestConnected(GetCurrentSQLConnString());
             }
         }
         private List<string> GetDatabase()
@@ -316,9 +334,11 @@ namespace SmartAlarmAgent.Views
                             Console.WriteLine("Break Test");
                             return TableNames;
                         }
-                        catch
+                        catch (Exception e)
                         {
-                            System.Windows.Forms.MessageBox.Show("Invalid Server name", "Get SQL Table"
+                            Console.WriteLine(e.Message);
+
+                            System.Windows.Forms.MessageBox.Show(e.Message, "Get SQL Table"
                             , MessageBoxButtons.OK, MessageBoxIcon.Warning);
                             return null;
                         }
@@ -327,8 +347,9 @@ namespace SmartAlarmAgent.Views
                     }
                     
                 }
-                catch
+                catch (Exception e)
                 {
+                    Console.WriteLine(e.Message);
                     return null;
                 }
             }

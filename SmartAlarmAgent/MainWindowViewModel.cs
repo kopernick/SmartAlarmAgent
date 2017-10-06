@@ -12,6 +12,7 @@ using System.Windows.Controls;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
 using SmartAlarmAgent.Views;
+using System.Windows;
 
 namespace SmartAlarmAgent
 {
@@ -28,12 +29,6 @@ namespace SmartAlarmAgent
         public ConnSetting ConnSettingView; //Child window:MainWindow
         public ICommand RunConnSetting { get; private set; }
 
-        private bool _flgMatchingInProgress;
-        public bool flgStart
-        {
-            get { return _flgMatchingInProgress; }
-        }
-
         private int _nNewRestPoint;
         public int nNewRestPoint
         {
@@ -41,6 +36,8 @@ namespace SmartAlarmAgent
         }
 
         public string _Time;
+        private string _dTimePre;
+
         public string Time
         {
             get { return _Time; }
@@ -57,8 +54,8 @@ namespace SmartAlarmAgent
         public MainWindowViewModel()
         {
             _connCfg.LoadConfiguration();
-            _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
+           // this._dTimePre = DateTime.Now.ToString("yyyyMM");
             DataProcessor = new DataProcessLogic(this._connCfg);
             RunConnSetting = new RelayCommand(o => ConnSetting(), o => canConnSetting());
             Initializer();
@@ -97,7 +94,19 @@ namespace SmartAlarmAgent
         private void dispatcherTimerClock_Tick(object sender, EventArgs e)
         {
             Time = DateTime.Now.ToLongTimeString();
-                
+
+            var dTimeNow = DateTime.Now.ToString("yyyyMM");
+
+            if ((Int32.Parse(dTimeNow) > Int32.Parse(_connCfg.CurrYearMont))
+                && (DataProcessor.flgStart != true))
+            { 
+                    Console.WriteLine("New Month is coming");
+
+                //TODO Save last month to csv and Clean up old data from SQL Server
+
+                _connCfg.SaveCurrentMonth(dTimeNow);
+            }
+
         }
 
         #endregion Methode
@@ -123,34 +132,16 @@ namespace SmartAlarmAgent
             t.RunSynchronously();
 #endif
 
-
-
         }
 
         private void StartConnSetting()
         {
-
-            ConnSettingView = new ConnSetting(this._connCfg); //Init Sort Condition By Create Instance SortFieldView
+            ConnSettingView = new ConnSetting(this._connCfg, this.DataProcessor); //Init Sort Condition By Create Instance SortFieldView
 
             ConnSettingView.ShowInTaskbar = true;
 
             ConnSettingView.ShowDialog();
-            if (ConnSettingView.DialogResult == ConnDialogResult.OK ||
-                ConnSettingView.DialogResult == ConnDialogResult.APPLY)
-            {
-                this._connCfg.SaveConfiguration();
 
-                DataProcessor.ConnCfg = this._connCfg;
-                _flgMatchingInProgress = false;
-               
-                DataProcessor.RefreshConnect( this._connCfg); //Refresh Connection Setting
-               
-                Console.WriteLine("ConnSetting was Saved");
-            }
-            else
-            {
-                Console.WriteLine("ConnSetting was Canceled");
-            }
         }
         #endregion Helper
     }
