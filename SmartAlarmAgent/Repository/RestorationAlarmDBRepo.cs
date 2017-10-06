@@ -13,6 +13,7 @@ using SmartAlarmData;
 using System.Data.Entity;
 using SmartAlarmAgent.Service;
 using SmartAlarmAgent.Model;
+using EntityFramework.Extensions;
 
 namespace SmartAlarmAgent.Repository
 {
@@ -138,7 +139,35 @@ namespace SmartAlarmAgent.Repository
             }
         }
 
-      
+        public async Task<bool> DeleteOldRecordsAsyn(int KeepMounth)
+        {
+            return await Task.Run(() => exeDeleteOldRecords(KeepMounth));
+        }
+
+
+        private bool exeDeleteOldRecords(int KeepMounth)
+        {
+             
+            //delete Old data than KeepMounts
+            try
+            {
+                DateTime beforKeepMonthDate = DateTime.Now.AddMonths((-1)*(KeepMounth-1));
+                
+                //Set First Day of Month
+                beforKeepMonthDate = new DateTime(beforKeepMonthDate.Year, beforKeepMonthDate.Month, 1);
+                this._RestAlarmContext.RestorationAlarmList.Where(x => x.DateTime < beforKeepMonthDate)
+                .Delete();
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+
+
+        }
+
         public bool GetDBStatus()
         {
             RestEventArgs args = new RestEventArgs();

@@ -296,6 +296,12 @@ namespace SmartAlarmAgent.Service
 
         }
 
+        public async void DeleteBulkRec(int nMonth)
+        {
+            await _mRestorationAlarmList.DeleteOldRecordsAsyn(nMonth); //Read RestorationAlarmList Table from DB
+
+        }
+
         #endregion Methode 
 
         #region Helper
