@@ -60,16 +60,16 @@ namespace SmartAlarmAgent.Repository
         {
             this._connCfg = connCfg;
 
-            this._RestAlarmContext = new RestorationAlarmDbContext(GetSQLConnString());
+            this._RestAlarmContext = new RestorationAlarmDbContext(GetConnString());
         }
 
         #endregion Constructor
 
         #region Methode
 
-        public string GetSQLConnString()
+        public string GetConnString()
         {
-            var sql = @"metadata=res://*/RestorationAlarmModel.csdl|res://*/RestorationAlarmModel.ssdl|res://*/RestorationAlarmModel.msl;" +
+            var strConn = @"metadata=res://*/RestorationAlarmModel.csdl|res://*/RestorationAlarmModel.ssdl|res://*/RestorationAlarmModel.msl;" +
            @"provider = System.Data.SqlClient;" +
            @"provider connection string=""" +
            "data source = "+ _connCfg.Server + ";" +
@@ -81,7 +81,7 @@ namespace SmartAlarmAgent.Repository
             //@"providerName = " + @"/"System.Data.EntityClient/"" +
            @"""";
 
-            return sql;
+            return strConn;
 
         }
 
@@ -106,8 +106,7 @@ namespace SmartAlarmAgent.Repository
                 return null;
                 
             }
-
-            
+    
         }
 
         public async Task<List<RestorationAlarmList>> GetRestorationAlarmListTimeDscAsync()
@@ -144,18 +143,16 @@ namespace SmartAlarmAgent.Repository
             return await Task.Run(() => exeDeleteOldRecords(KeepMounth));
         }
 
-
         private bool exeDeleteOldRecords(int KeepMounth)
         {
-             
             //delete Old data than KeepMounts
             try
             {
-                DateTime beforKeepMonthDate = DateTime.Now.AddMonths((-1)*(KeepMounth-1));
-                
-                //Set First Day of Month
-                beforKeepMonthDate = new DateTime(beforKeepMonthDate.Year, beforKeepMonthDate.Month, 1);
-                this._RestAlarmContext.RestorationAlarmList.Where(x => x.DateTime < beforKeepMonthDate)
+                DateTime StartKeepDate = DateTime.Now.AddMonths((-1)*(KeepMounth-1));
+
+                //Set First Day of Month by EntityFramework.Extended
+                StartKeepDate = new DateTime(StartKeepDate.Year, StartKeepDate.Month, 1);
+                this._RestAlarmContext.RestorationAlarmList.Where(x => x.DateTime < StartKeepDate)
                 .Delete();
 
                 return true;
@@ -164,8 +161,6 @@ namespace SmartAlarmAgent.Repository
             {
                 return false;
             }
-
-
         }
 
         public bool GetDBStatus()
@@ -189,7 +184,6 @@ namespace SmartAlarmAgent.Repository
         {
             this._RestAlarmContext.SaveChanges();
         }
-
 
         #endregion Methode
 
