@@ -78,7 +78,7 @@ namespace SmartAlarmAgent.Service
             }
         }
         private string _CSVStatus;
-        public string CSVStatus
+        public string strCSVStatus
         {
             get
             {
@@ -88,7 +88,7 @@ namespace SmartAlarmAgent.Service
             set
             {
                 _CSVStatus = value;
-                OnPropertyChanged(nameof(CSVStatus));
+                OnPropertyChanged(nameof(strCSVStatus));
             }
         }
 
@@ -167,18 +167,18 @@ namespace SmartAlarmAgent.Service
             }
         }
 
-        private string _DBStatus;
-        public string DBStatus
+        private string _strDBStatus;
+        public string strDBStatus
         {
             get
             {
-                return _DBStatus;
+                return _strDBStatus;
 
             }
             set
             {
-                _DBStatus = value;
-                OnPropertyChanged(nameof(DBStatus));
+                _strDBStatus = value;
+                OnPropertyChanged(nameof(strDBStatus));
             }
         }
 
@@ -216,6 +216,12 @@ namespace SmartAlarmAgent.Service
         private static RestorationAlarmDBRepo _mRestorationAlarmList;
 
         private List<DigitalPointInfo> _DigitalPointInfoList;
+        private bool _dBStatus;
+        public bool dBStatus
+        {
+            get { return _dBStatus; }
+        }
+
         public List<DigitalPointInfo> DigitalPointInfoList
         {
             get { return _DigitalPointInfoList; }
@@ -266,6 +272,7 @@ namespace SmartAlarmAgent.Service
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
             this.nLastAlarmRecIndex = -1;
+            this._dBStatus = false;
 
         }
         #endregion Constructor
@@ -289,6 +296,7 @@ namespace SmartAlarmAgent.Service
             _flgMatchingInProgress = false;
             this._nNewRestPoint = 0;
             this.nLastAlarmRecIndex = -1;
+            this._dBStatus = false;
 
             _mAlarmList.CSVLastModify = DateTime.Now.AddYears(-1); //Reset CSV file's Last Mod date
 
@@ -296,7 +304,7 @@ namespace SmartAlarmAgent.Service
 
         }
 
-        public async void DeleteBulkRec(int nMonth)
+        public async void DeleteOldRecordsAsyn(int nMonth)
         {
             await _mRestorationAlarmList.DeleteOldRecordsAsyn(nMonth); //Read RestorationAlarmList Table from DB
 
@@ -539,20 +547,18 @@ namespace SmartAlarmAgent.Service
                 _flgMatchingInProgress = false;
             }
 
-
             //updateLogConsole((int)EventLogPosition.REST_NEW_POINT, $"Has {_nNewRestPoint} Restoration Alarm(s)");
 
             return true;
         }
 
-        private async void OnDBChanged(object source, RestEventArgs args)
+        private void OnDBChanged(object source, RestEventArgs args)
         {
             switch (args.message)
             {
 
                 case "Read DB Success":
                     Console.WriteLine(args.TimeStamp.ToString() + " : Read Database Success");
-
                     break;
 
                 case "Read DB Fail":
@@ -565,11 +571,14 @@ namespace SmartAlarmAgent.Service
 
                 case "Connected":
                     //UpdateActivityMonitor(args, "Activity");
-                    UpdateConnectionStatus(args, "DBStatus", true);//Update CSV File Status
+                    _dBStatus = true;
+                    UpdateConnectionStatus(args, "DBStatus", _dBStatus);//Update CSV File Status
                     break;
+
                 case "Disconnected":
                     //UpdateActivityMonitor(args, "Activity");
-                    UpdateConnectionStatus(args, "DBStatus", false);//Update Database File Status
+                    _dBStatus = false;
+                    UpdateConnectionStatus(args, "DBStatus", _dBStatus);//Update Database File Status
                     break;
 
                 default:
@@ -598,7 +607,7 @@ namespace SmartAlarmAgent.Service
            if (_target == "CSVStatus")
             {
                 CSVLastModify = _mAlarmList.CSVLastModify;
-                CSVStatus = state ? "Connection OK" : "Connection Fail";
+                strCSVStatus = state ? "Connection OK" : "Connection Fail";
                 
                 CSVFile = this._connCfg.CsvFile;
                 CSVLastAlarm = LastCsvItem != null ? (LastCsvItem.Time.ToString() + " : " + LastCsvItem.PointName) : "Non";
@@ -608,7 +617,7 @@ namespace SmartAlarmAgent.Service
             {
                 //var db = new RestorationAlarmDbContext();
                 DBLastAccess = args.TimeStamp;
-                DBStatus = state ? "Database Connected" : "Can't Connect to Database";
+                strDBStatus = state ? "Database Connected" : "Can't Connect to Database";
                 
                 DBName = this._connCfg.Server + ": " + this._connCfg.Database;
                 DBSLastRec = LastRestAlarmPoint != null ? (LastRestAlarmPoint.DateTime.ToString() + " : " + LastRestAlarmPoint.ShortName) : "Non";

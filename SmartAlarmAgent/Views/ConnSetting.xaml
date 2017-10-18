@@ -170,7 +170,9 @@
 
         </GroupBox>
         
-        <Button Name="btnApply" DockPanel.Dock="Bottom" Grid.Row="1" Grid.Column="0" MinWidth="200"
+        <Button Name="btnApply" DockPanel.Dock="Bottom" 
+                Grid.Row="1" Grid.Column="0" MinWidth="200"
+                Background="Yellow"
                 Grid.ColumnSpan="1" Margin="10" Padding="4" HorizontalAlignment="Center" Click="btnApply_Click" >
             Apply
            
@@ -179,7 +181,7 @@
         <Button Name="btnSave" DockPanel.Dock="Bottom" Grid.Row="1" Grid.Column="1" MinWidth="200"
                 Grid.ColumnSpan="1" Margin="10"
                 Padding="6" 
-                HorizontalAlignment="Right" 
+                HorizontalAlignment="Center" 
                 Background="Green"
                 FontWeight ="Bold"
                 Click="btnSave_Click" >

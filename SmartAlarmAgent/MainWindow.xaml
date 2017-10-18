@@ -92,7 +92,7 @@
                 </Label>
                 <TextBlock Grid.Column="1" Grid.Row="3" MinWidth="100" Grid.RowSpan="1"  
                            VerticalAlignment="Center" FontSize="11" FontWeight="Bold"
-                           Text="{Binding DataProcessor.CSVStatus, UpdateSourceTrigger=PropertyChanged}" 
+                           Text="{Binding DataProcessor.strCSVStatus, UpdateSourceTrigger=PropertyChanged}" 
                            Foreground="White" Background="{Binding DataProcessor.CSVBackgroundColor}" Margin="2">
                 </TextBlock>
             </Grid>
@@ -143,7 +143,7 @@
                 </Label>
                 <TextBlock Grid.Column="1" Grid.Row="3" MinWidth="100" Grid.RowSpan="1"  
                                  VerticalAlignment="Center" FontSize="11" FontWeight="Bold"
-                           Text="{Binding DataProcessor.DBStatus, UpdateSourceTrigger=PropertyChanged}" 
+                           Text="{Binding DataProcessor.strDBStatus, UpdateSourceTrigger=PropertyChanged}" 
                                         Foreground="White" Background="{Binding DataProcessor.DBBackgroundColor}" Margin="2">
                 </TextBlock>
 

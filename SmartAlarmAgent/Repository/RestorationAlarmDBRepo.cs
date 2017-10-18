@@ -73,9 +73,9 @@ namespace SmartAlarmAgent.Repository
            @"provider = System.Data.SqlClient;" +
            @"provider connection string=""" +
            "data source = "+ _connCfg.Server + ";" +
-          "initial catalog = " + _connCfg.Database + ";" +
-          "user id = " + _connCfg.Login + ";" +
-          "password = " + _connCfg.Password + ";" +
+           "initial catalog = " + _connCfg.Database + ";" +
+           "user id = " + _connCfg.Login + ";" +
+           "password = " + _connCfg.Password + ";" +
            @"multipleactiveresultsets = True;" +
            @"App = EntityFramework ;" +
             //@"providerName = " + @"/"System.Data.EntityClient/"" +

@@ -97,14 +97,17 @@ namespace SmartAlarmAgent
 
             var dTimeNow = DateTime.Now.ToString("yyyyMM");
 
-            if ((Int32.Parse(dTimeNow) > Int32.Parse(_connCfg.CurrYearMont))
-                && (DataProcessor.flgStart != true))
+            if ((Int32.Parse(dTimeNow) > Int32.Parse(_connCfg.CurrYearMont)))
             {
-                Console.WriteLine("New Month is coming");
+                if(DataProcessor.flgStart != true && DataProcessor.dBStatus == true)
+                {
+                    Console.WriteLine("New Month is coming");
 
-                //TODO Save last month to csv In the future 
-                DataProcessor.DeleteBulkRec(3); //Cleaning up old than 3 months from SQL Server
-                _connCfg.SaveCurrentMonth(dTimeNow);
+                    //TODO Save last month to csv In the future 
+                    DataProcessor.DeleteOldRecordsAsyn(3); //Cleaning up old than 3 months from SQL Server
+                    _connCfg.SaveCurrentMonth(dTimeNow);
+                }
+
             }
 
         }

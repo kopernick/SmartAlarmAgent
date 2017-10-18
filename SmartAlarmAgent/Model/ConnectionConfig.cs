@@ -61,10 +61,10 @@ namespace SmartAlarmAgent.Model
                     this.Database = reg.GetValue("Database").ToString();
 
 
-                if (reg.GetValue("CurrentYearMont") == null)
+                if (reg.GetValue("CurrentMonth") == null)
                     this.CurrYearMont = "0";
                 else
-                    this.CurrYearMont = reg.GetValue("CurrentYearMont").ToString();
+                    this.CurrYearMont = reg.GetValue("CurrentMonth").ToString();
                 
                 
                 reg.Close();
@@ -92,7 +92,7 @@ namespace SmartAlarmAgent.Model
                 reg.SetValue("Password", this.Password);
                 reg.SetValue("CsvFile", this.CsvFile);
                 reg.SetValue("Database", this.Database);
-                reg.SetValue("CurrentYearMont", this.CurrYearMont);
+                reg.SetValue("CurrentMonth", this.CurrYearMont);
 
                 reg.Close();
             }
@@ -108,7 +108,7 @@ namespace SmartAlarmAgent.Model
             try
             {
                 Microsoft.Win32.RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SmartAlarmConfig", true);
-                reg.SetValue("CurrentYearMont", this.CurrYearMont);
+                reg.SetValue("CurrentMonth", this.CurrYearMont);
 
                 reg.Close();
             }
