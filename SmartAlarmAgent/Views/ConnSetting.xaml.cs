@@ -182,7 +182,7 @@ namespace SmartAlarmAgent.Views
         {
             if (IsFileExits(this.txtCSVPath.Text))
             {
-                System.Windows.Forms.MessageBox.Show("File AlarmList.CSV มีใน " + this.txtCSVPath.Text, "Check AlarmList.csv"
+                System.Windows.Forms.MessageBox.Show("Found AlarmList.csv in " + this.txtCSVPath.Text, "Check AlarmList.csv"
                     , MessageBoxButtons.OK, MessageBoxIcon.Information);
                 this.fileDirectory = this.txtCSVPath.Text; //Get File Directory
                 //_connCfg.CsvDirectory = this.fileDirectory;
@@ -192,7 +192,7 @@ namespace SmartAlarmAgent.Views
             }
             else
             {
-                System.Windows.Forms.MessageBox.Show("ไม่พบ File AlarmList.CSV ใน " + this.txtCSVPath.Text, "Check AlarmList.csv"
+                System.Windows.Forms.MessageBox.Show("Not Found AlarmList.csv in " + this.txtCSVPath.Text, "Check AlarmList.csv"
                     , MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
         }
@@ -366,6 +366,7 @@ namespace SmartAlarmAgent.Views
         {
             this.database = this.cmbDatabase.SelectedItem.ToString();
             this.txtSelectedDB.Content = this.database;
+            btnTestSQL.IsEnabled = true;
             Console.WriteLine("Select Database: " + this.database);
         }
     }

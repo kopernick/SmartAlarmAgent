@@ -103,14 +103,13 @@ namespace SmartAlarmAgent.Model
         }
         public void SaveCurrentMonth(string currMont)
         {
-            this.CurrYearMont = currMont;
-
             try
             {
+                
                 Microsoft.Win32.RegistryKey reg = Microsoft.Win32.Registry.CurrentUser.OpenSubKey("SmartAlarmConfig", true);
-                reg.SetValue("CurrentMonth", this.CurrYearMont);
-
+                reg.SetValue("CurrentMonth", currMont);
                 reg.Close();
+                this.CurrYearMont = currMont;
             }
             catch (Exception err)
             {

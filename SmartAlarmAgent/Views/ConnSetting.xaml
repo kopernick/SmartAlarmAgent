@@ -26,6 +26,7 @@
                 <Grid.ColumnDefinitions >
                     <ColumnDefinition Width ="Auto"/>
                     <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width ="Auto"/>
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition/>
@@ -43,6 +44,7 @@
                        Content="Server Name:" />
 
                 <TextBox Name="txtServer" Grid.Row="0" Grid.Column="1" Margin="2" MinWidth="180" Width="Auto"
+                         Grid.ColumnSpan="2"
                          TextWrapping="Wrap"
                          
                           
@@ -56,6 +58,7 @@
                        Content="User Name:" />
 
                 <TextBox Name ="txtLogin" Grid.Row="2" Grid.Column="1" Margin="2" MinWidth="180" 
+                         Grid.ColumnSpan="2"
                          TextWrapping="Wrap"
                          
 
@@ -68,7 +71,7 @@
 
 
                 <PasswordBox Name ="txtPassword" Grid.Row="3" Grid.Column="1" Margin="2" MinWidth="180" 
-                         
+                         Grid.ColumnSpan="2"
                          IsEnabled="true" BorderBrush="{x:Null}"/>
 
 
@@ -77,19 +80,19 @@
                        FontWeight="Normal" 
                        Content="Database:" />
 
-                <ComboBox Name ="cmbDatabase" Grid.Row="4" Grid.Column="1"  MinWidth="180" 
+                <ComboBox Name ="cmbDatabase" Grid.Row="4" Grid.Column="1"  
                     Margin="2,2,0,2" SelectionChanged="cmbDatabase_SelectionChanged"
-                          MouseEnter ="btnGetDb_Click">
+                          >
 
                 </ComboBox>
 
-                <!--<Button Name ="btnGetDb" Grid.Row="4" Grid.Column="2" MinWidth="40"
+                <Button Name ="btnGetDb" Grid.Row="4" Grid.Column="2" MinWidth="40"
                         HorizontalAlignment="Right"
                         Margin="2"
                         Padding="2"
-                        Content="GetDB" Click="btnGetDb_Click"/>-->
+                        Content="GetDB" Click="btnGetDb_Click"/>
 
-                <Path Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2" Stroke="#FFA09E9E" StrokeThickness="0.75" Stretch="Fill">
+                <Path Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="3" Stroke="#FFA09E9E" StrokeThickness="0.75" Stretch="Fill">
                     <Path.Data>
                         <LineGeometry StartPoint="0,0" EndPoint="1,0" />
                     </Path.Data>
@@ -99,7 +102,7 @@
                         HorizontalAlignment="Left"
                         Margin="1,5,1,1"
                         Padding="2"
-                        Content="Test Connection" Click="btnTestSQL_Click"/>
+                        Content="Test Connection" Click="btnTestSQL_Click" IsEnabled="False"/>
                 <Label Name ="txtSelectedDB" Grid.Row="6" Grid.Column="1" 
                        Margin="1,5,1,1"
                        FontWeight="Normal" >
